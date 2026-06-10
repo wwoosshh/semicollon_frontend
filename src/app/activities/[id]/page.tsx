@@ -186,6 +186,63 @@ export default async function ActivityDetailPage({
           line-height: 1.6;
           margin: 0;
         }
+
+        /* ── Activity Image Gallery ── */
+        .act-gallery-block {
+          margin-top: 2.5rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid var(--hairline);
+        }
+        .act-gallery-label {
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
+          margin-bottom: 1rem;
+          display: block;
+        }
+        /* 1 image → full width; 2+ → 2-column grid */
+        .act-gallery-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1px;
+          border: 1px solid var(--hairline);
+        }
+        .act-gallery-grid-multi {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .act-gallery-frame {
+          overflow: hidden;
+          background: var(--paper-deep);
+          border: none;
+        }
+        /* inner separator lines via gap + hairline on the grid container */
+        .act-gallery-grid > .act-gallery-frame:not(:last-child) {
+          border-bottom: 1px solid var(--hairline);
+        }
+        .act-gallery-grid-multi > .act-gallery-frame:nth-child(odd) {
+          border-right: 1px solid var(--hairline);
+          border-bottom: none;
+        }
+        .act-gallery-grid-multi > .act-gallery-frame:not(:nth-last-child(-n+2)) {
+          border-bottom: 1px solid var(--hairline);
+        }
+        .act-gallery-grid-multi > .act-gallery-frame:nth-child(odd):not(:nth-last-child(-n+2)) {
+          border-bottom: 1px solid var(--hairline);
+        }
+        .act-gallery-frame img {
+          width: 100%;
+          display: block;
+          object-fit: cover;
+          aspect-ratio: 4 / 3;
+          background: var(--paper-deep);
+        }
+        .act-gallery-grid:not(.act-gallery-grid-multi) .act-gallery-frame img {
+          aspect-ratio: 16 / 9;
+          max-height: 28rem;
+          object-fit: contain;
+        }
       `}</style>
 
       <div className="detail-page">
@@ -243,6 +300,28 @@ export default async function ActivityDetailPage({
                 <p className="detail-tags-text">
                   {activity.tags.join(', ')}
                 </p>
+              </div>
+            )}
+
+            {/* Activity image gallery — 괘선 프레임, 1열(1장) 또는 2열(2장+) */}
+            {activity.image_urls && activity.image_urls.length > 0 && (
+              <div className="act-gallery-block">
+                <span className="act-gallery-label">
+                  {'// 활동 이미지 — '}{activity.image_urls.length}
+                </span>
+                <div
+                  className={`act-gallery-grid${activity.image_urls.length > 1 ? ' act-gallery-grid-multi' : ''}`}
+                >
+                  {activity.image_urls.map((url, i) => (
+                    <div key={i} className="act-gallery-frame">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={url}
+                        alt={`활동 이미지 ${i + 1}`}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

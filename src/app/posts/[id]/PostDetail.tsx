@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
 import { getAccessToken } from '@/lib/supabase';
 import type { Post } from '@/lib/types';
+import Comments from './Comments';
 
 // ─── Helpers ──────────────────────────────────────────────────
 function formatDate(iso: string): string {
@@ -319,6 +320,9 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
                     </div>
                   )}
                 </div>
+
+                {/* Comments — rendered only when post is loaded */}
+                <Comments postId={id} />
               </>
             )}
           </div>

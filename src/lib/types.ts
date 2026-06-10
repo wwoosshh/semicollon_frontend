@@ -33,8 +33,16 @@ export interface Activity {
   type: 'project' | 'study' | 'event';
   year: number;
   thumbnail_url: string | null;
+  image_urls: string[];
   tags: string[];
   created_at: string;
+}
+
+export interface PostComment {
+  id: number;
+  content: string;
+  created_at: string;
+  author: { name: string } | null;
 }
 
 export interface Application {
