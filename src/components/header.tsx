@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/components/auth-provider';
 
 const NAV_LINKS = [
   { href: '/about',      label: '소개' },
@@ -13,8 +14,10 @@ const NAV_LINKS = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { session, profile, loading, signOut } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -26,6 +29,14 @@ export default function Header() {
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/');
+  };
+
+  // Displayed name: profile.name or email fallback
+  const displayName = profile?.name ?? session?.user?.email ?? '';
 
   return (
     <header
@@ -111,15 +122,44 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Right side: Login + Hamburger */}
+          {/* Right side: Auth + Hamburger */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Link
-              href="/login"
-              className="hidden md:inline-flex btn btn-ghost"
-              style={{ padding: '0.5rem 1.125rem', fontSize: '0.9rem' }}
-            >
-              로그인
-            </Link>
+            {/* Desktop auth buttons */}
+            {!loading && (
+              session ? (
+                <div className="hidden md:flex" style={{ alignItems: 'center', gap: '0.5rem' }}>
+                  <span
+                    style={{
+                      fontSize: '0.9rem',
+                      color: 'var(--text-muted)',
+                      fontWeight: 500,
+                      whiteSpace: 'nowrap',
+                      maxWidth: '10rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {displayName}님
+                  </span>
+                  <button
+                    onClick={handleSignOut}
+                    className="btn btn-ghost"
+                    style={{ padding: '0.5rem 1.125rem', fontSize: '0.9rem' }}
+                    type="button"
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="hidden md:inline-flex btn btn-ghost"
+                  style={{ padding: '0.5rem 1.125rem', fontSize: '0.9rem' }}
+                >
+                  로그인
+                </Link>
+              )
+            )}
 
             {/* Hamburger button (mobile only) */}
             <button
@@ -189,7 +229,7 @@ export default function Header() {
         className="md:hidden"
         style={{
           overflow: 'hidden',
-          maxHeight: menuOpen ? '400px' : '0',
+          maxHeight: menuOpen ? '480px' : '0',
           transition: 'max-height 300ms cubic-bezier(0.4, 0, 0.2, 1)',
           borderTop: menuOpen ? '1px solid var(--border)' : 'none',
         }}
@@ -234,13 +274,38 @@ export default function Header() {
                 borderTop: '1px solid var(--border-soft)',
               }}
             >
-              <Link
-                href="/login"
-                className="btn btn-ghost"
-                style={{ width: '100%', justifyContent: 'center' }}
-              >
-                로그인
-              </Link>
+              {!loading && (
+                session ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <span
+                      style={{
+                        fontSize: '0.875rem',
+                        color: 'var(--text-muted)',
+                        fontWeight: 500,
+                        padding: '0 0.25rem',
+                      }}
+                    >
+                      {displayName}님
+                    </span>
+                    <button
+                      onClick={handleSignOut}
+                      className="btn btn-ghost"
+                      style={{ width: '100%', justifyContent: 'center' }}
+                      type="button"
+                    >
+                      로그아웃
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="btn btn-ghost"
+                    style={{ width: '100%', justifyContent: 'center' }}
+                  >
+                    로그인
+                  </Link>
+                )
+              )}
             </li>
           </ul>
         </nav>

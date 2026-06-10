@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
+import { AuthProvider } from '@/components/auth-provider';
 
 export const metadata: Metadata = {
   title: '세미콜론 | Semicollon',
@@ -17,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <Header />
-        <main style={{ flex: 1 }}>{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main style={{ flex: 1 }}>{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
