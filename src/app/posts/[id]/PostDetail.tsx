@@ -9,87 +9,50 @@ import type { Post } from '@/lib/types';
 // ─── Helpers ──────────────────────────────────────────────────
 function formatDate(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}.${m}.${day}`;
 }
 
-// ─── SVG Icons ────────────────────────────────────────────────
-function IconBack() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M13 8H3M7 12l-4-4 4-4" />
-    </svg>
-  );
-}
-
-function IconLock() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
-
-function IconCalendar() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  );
-}
-
-function IconUser() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function IconNotFound() {
-  return (
-    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="28" cy="28" r="22" />
-      <path d="M21 21l14 14M35 21L21 35" opacity="0.5" />
-    </svg>
-  );
-}
-
-// ─── Skeleton ─────────────────────────────────────────────────
+// ─── Loading Skeleton (print-tone) ────────────────────────────
 function DetailSkeleton() {
   return (
     <div aria-hidden="true">
       <style>{`
-        .det-skel {
-          border-radius: var(--radius-sm);
-          background: linear-gradient(90deg, var(--surface-alt) 25%, var(--border-soft) 50%, var(--surface-alt) 75%);
-          background-size: 200% 100%;
-          animation: det-shimmer 1.4s infinite;
+        .det-load-row {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.75rem 0;
+          border-bottom: 1px solid var(--hairline);
         }
-        @keyframes det-shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
+        .det-load-bar {
+          height: 1px;
+          background: var(--hairline);
+          flex: 1;
+        }
+        .det-load-label {
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          letter-spacing: 0.1em;
+          color: var(--ink-faint);
+          animation: det-blink 1.2s step-end infinite;
+        }
+        @keyframes det-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.2; }
         }
       `}</style>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <div className="det-skel" style={{ height: '1.125rem', width: '5rem', borderRadius: '999px' }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <div className="det-skel" style={{ height: '2.25rem', width: '75%' }} />
-          <div className="det-skel" style={{ height: '2.25rem', width: '50%' }} />
-        </div>
-        <div style={{ display: 'flex', gap: '1.25rem', paddingTop: '0.5rem' }}>
-          <div className="det-skel" style={{ height: '0.875rem', width: '6rem' }} />
-          <div className="det-skel" style={{ height: '0.875rem', width: '8rem' }} />
-        </div>
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {[100, 90, 95, 70].map((w, i) => (
-            <div key={i} className="det-skel" style={{ height: '1rem', width: `${w}%` }} />
-          ))}
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '2rem' }}>
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="det-load-row">
+            <div className="det-load-bar" />
+            {i === 0 && (
+              <span className="det-load-label">{'// loading...'}</span>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -134,106 +97,115 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
         /* ── Detail Layout ── */
         .det-wrap {
           min-height: 60vh;
-          padding: 4.5rem 1.25rem 6rem;
+          padding: 3.5rem 0 6rem;
         }
-        @media (min-width: 640px) { .det-wrap { padding: 5.5rem 2rem 7rem; } }
-        @media (min-width: 1024px) { .det-wrap { padding: 6rem 2.5rem 7rem; } }
 
         .det-inner {
           max-width: 760px;
         }
 
-        /* Back */
+        /* ── Back link ── */
         .det-back {
           display: inline-flex;
           align-items: center;
           gap: 0.375rem;
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: var(--text-muted);
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--ink-soft);
           text-decoration: none;
-          margin-bottom: 2.5rem;
-          transition: color 150ms ease;
-          letter-spacing: -0.01em;
+          margin-bottom: 3rem;
+          transition: color 140ms ease;
         }
-        .det-back:hover { color: var(--accent); }
+        .det-back:hover { color: var(--vermilion); }
 
-        /* Header */
+        /* ── Post header ── */
         .det-header {
           margin-bottom: 2.5rem;
-          padding-bottom: 2rem;
-          border-bottom: 1px solid var(--border);
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
         }
-        .det-badges {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-        }
-        .det-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.3rem;
-          padding: 0.25rem 0.625rem;
-          border-radius: 999px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.03em;
-        }
-        .det-badge-notice { background: var(--accent-light); color: var(--accent); }
-        .det-badge-blog { background: var(--surface-alt); color: var(--text-muted); border: 1px solid var(--border); }
-        .det-badge-member { background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe; }
 
+        /* Meta line: date · author · category · MEMBER */
+        .det-meta-line {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+          margin-bottom: 1.5rem;
+        }
+        .det-meta-date {
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          letter-spacing: 0.08em;
+          color: var(--ink-faint);
+        }
+        .det-meta-sep {
+          font-family: var(--font-mono);
+          font-size: 0.55rem;
+          color: var(--hairline);
+          user-select: none;
+        }
+        .det-meta-author {
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          letter-spacing: 0.04em;
+          color: var(--ink-soft);
+        }
+        .det-meta-cat {
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--vermilion);
+        }
+        .det-meta-member {
+          font-family: var(--font-mono);
+          font-size: 0.6rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--vermilion);
+          border: 1px solid var(--vermilion);
+          padding: 0.15rem 0.375rem;
+          line-height: 1.4;
+        }
+
+        /* Title */
         .det-h1 {
-          font-size: clamp(1.625rem, 4.5vw, 2.625rem);
-          font-weight: 800;
-          letter-spacing: -0.035em;
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: clamp(1.75rem, 5vw, 3rem);
           line-height: 1.2;
-          color: var(--foreground);
+          letter-spacing: -0.02em;
+          color: var(--ink);
+          margin: 0 0 1.75rem;
+        }
+
+        /* Hairline rule below header */
+        .det-rule {
+          border: 0;
+          border-top: 1px solid var(--ink);
           margin: 0;
         }
 
-        .det-meta {
-          display: flex;
-          align-items: center;
-          gap: 1.25rem;
-          flex-wrap: wrap;
-        }
-        .det-meta-item {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.375rem;
-          font-size: 0.875rem;
-          color: var(--text-muted);
-          font-weight: 500;
-        }
-        .det-meta-item svg { flex-shrink: 0; color: var(--text-subtle); }
-        .det-meta-date {
-          font-family: var(--font-mono);
-          font-size: 0.8125rem;
-          color: var(--text-subtle);
-          letter-spacing: 0.01em;
-        }
-
-        /* Body */
+        /* ── Body ── */
         .det-body {
+          padding-top: 2.5rem;
           display: flex;
           flex-direction: column;
           gap: 2.5rem;
         }
+
         .det-content {
+          font-family: var(--font-sans);
           font-size: 1.0625rem;
-          color: var(--text-muted);
+          color: var(--ink-soft);
           line-height: 1.9;
           white-space: pre-wrap;
           word-break: break-word;
           margin: 0;
         }
 
-        /* Images */
+        /* ── Images —괘선 프레임, 직각 ── */
         .det-images {
           display: flex;
           flex-direction: column;
@@ -241,135 +213,102 @@ export default function PostDetail({ params }: { params: Promise<{ id: string }>
         }
         .det-images-label {
           font-family: var(--font-mono);
-          font-size: 0.6875rem;
-          font-weight: 600;
-          color: var(--text-subtle);
-          letter-spacing: 0.1em;
+          font-size: 0.65rem;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
-          margin-bottom: 0.25rem;
+          color: var(--ink-faint);
+          margin-bottom: 0.5rem;
         }
-        .det-image-wrap {
-          border-radius: var(--radius-lg);
+        .det-image-frame {
+          border: 1px solid var(--hairline);
           overflow: hidden;
-          border: 1px solid var(--border);
-          box-shadow: var(--shadow-sm);
         }
-        .det-image-wrap img {
+        .det-image-frame img {
           width: 100%;
           display: block;
           max-height: 32rem;
           object-fit: contain;
-          background: var(--surface);
+          background: var(--paper-deep);
         }
 
-        /* Not Found state */
+        /* ── Not Found ── */
         .det-nf {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1.25rem;
-          padding: 5rem 2rem;
-          text-align: center;
+          padding: 4rem 0;
         }
-        .det-nf-icon { color: var(--text-subtle); }
-        .det-nf-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          letter-spacing: -0.025em;
-          color: var(--foreground);
-          margin: 0;
-        }
-        .det-nf-sub {
+        .det-nf-code {
           font-family: var(--font-mono);
-          font-size: 0.875rem;
-          color: var(--text-subtle);
-          margin: 0;
+          font-size: 0.85rem;
+          letter-spacing: 0.04em;
+          color: var(--ink-faint);
+          margin: 0 0 2rem;
         }
         .det-nf-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.4375rem;
-          padding: 0.625rem 1.5rem;
-          border-radius: 999px;
-          border: 1.5px solid var(--border);
-          color: var(--foreground);
-          font-weight: 600;
-          font-size: 0.9375rem;
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--ink-soft);
           text-decoration: none;
-          margin-top: 0.5rem;
-          transition: border-color 150ms ease, background 150ms ease;
+          transition: color 140ms ease;
         }
-        .det-nf-link:hover { background: var(--surface); border-color: var(--text-subtle); }
+        .det-nf-link:hover { color: var(--vermilion); }
       `}</style>
 
       <div className="det-wrap">
         <div className="container-page">
           <div className="det-inner">
             <Link href="/posts" className="det-back">
-              <IconBack />
-              소식 목록으로
+              ← INDEX
             </Link>
 
             {loading ? (
               <DetailSkeleton />
             ) : notFound || !post ? (
               <div className="det-nf">
-                <span className="det-nf-icon"><IconNotFound /></span>
-                <div>
-                  <p className="det-nf-title">게시글을 찾을 수 없습니다</p>
-                  <p className="det-nf-sub">// post not found or access denied</p>
-                </div>
-                <Link href="/posts" className="det-nf-link">
-                  <IconBack />
-                  목록으로 돌아가기
-                </Link>
+                <p className="det-nf-code">{'// 게시글을 찾을 수 없습니다'}</p>
+                <Link href="/posts" className="det-nf-link">← INDEX</Link>
               </div>
             ) : (
               <>
                 {/* Header */}
                 <div className="det-header">
-                  {/* Badges */}
-                  <div className="det-badges">
-                    <span className={`det-badge ${post.category === 'notice' ? 'det-badge-notice' : 'det-badge-blog'}`}>
-                      {post.category === 'notice' ? '공지' : '블로그'}
+                  {/* Meta line */}
+                  <div className="det-meta-line">
+                    <span className="det-meta-date">{formatDate(post.created_at)}</span>
+                    <span className="det-meta-sep" aria-hidden="true">◆</span>
+                    <span className="det-meta-author">
+                      {(post.profiles?.name ?? '알 수 없음').toLowerCase()}
+                    </span>
+                    <span className="det-meta-sep" aria-hidden="true">◆</span>
+                    <span className="det-meta-cat">
+                      {post.category === 'notice' ? 'NOTICE' : 'BLOG'}
                     </span>
                     {post.visibility === 'member' && (
-                      <span className="det-badge det-badge-member">
-                        <IconLock />
-                        부원 공개
-                      </span>
+                      <>
+                        <span className="det-meta-sep" aria-hidden="true">◆</span>
+                        <span className="det-meta-member">MEMBER</span>
+                      </>
                     )}
                   </div>
 
                   {/* Title */}
                   <h1 className="det-h1">{post.title}</h1>
 
-                  {/* Meta */}
-                  <div className="det-meta">
-                    <span className="det-meta-item">
-                      <IconUser />
-                      {post.profiles?.name ?? '알 수 없음'}
-                    </span>
-                    <span className="det-meta-item det-meta-date">
-                      <IconCalendar />
-                      {formatDate(post.created_at)}
-                    </span>
-                  </div>
+                  {/* Hairline separator */}
+                  <hr className="det-rule" />
                 </div>
 
                 {/* Body */}
                 <div className="det-body">
-                  {/* Content */}
                   {post.content && (
                     <p className="det-content">{post.content}</p>
                   )}
 
-                  {/* Images */}
                   {post.image_urls && post.image_urls.length > 0 && (
                     <div className="det-images">
-                      <p className="det-images-label">첨부 이미지</p>
+                      <p className="det-images-label">// 첨부 이미지</p>
                       {post.image_urls.map((url, i) => (
-                        <div key={i} className="det-image-wrap">
+                        <div key={i} className="det-image-frame">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={url}

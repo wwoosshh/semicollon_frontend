@@ -9,9 +9,9 @@ import type { PostSummary } from '@/lib/types';
 
 // ─── Constants ────────────────────────────────────────────────
 const TABS = [
-  { key: '', label: '전체', mono: 'all' },
-  { key: 'notice', label: '공지', mono: 'notice' },
-  { key: 'blog', label: '블로그', mono: 'blog' },
+  { key: '', label: '전체', mono: 'ALL' },
+  { key: 'notice', label: '공지', mono: 'NOTICE' },
+  { key: 'blog', label: '블로그', mono: 'BLOG' },
 ] as const;
 
 type CategoryKey = '' | 'notice' | 'blog';
@@ -19,91 +19,29 @@ type CategoryKey = '' | 'notice' | 'blog';
 // ─── Helpers ──────────────────────────────────────────────────
 function formatDate(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}.${m}.${day}`;
 }
 
-// ─── SVG Icons ────────────────────────────────────────────────
-function IconEdit() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-    </svg>
-  );
-}
-
-function IconEmpty() {
-  return (
-    <svg width="44" height="44" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="8" y="8" width="32" height="32" rx="5" />
-      <path d="M16 18h16M16 24h10M16 30h8" opacity="0.35" />
-    </svg>
-  );
-}
-
-function IconAlertTriangle() {
-  return (
-    <svg width="44" height="44" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M24 7L4 41h40L24 7z" />
-      <line x1="24" y1="21" x2="24" y2="29" />
-      <circle cx="24" cy="35" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-
-function IconLock() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
-
-// ─── Skeleton ─────────────────────────────────────────────────
-function SkeletonCard() {
-  return (
-    <div
-      className="post-card post-card-skeleton"
-      aria-hidden="true"
-    >
-      <div className="skel skel-badge" />
-      <div className="skel skel-title" />
-      <div className="skel skel-title skel-title-short" />
-      <div className="skel skel-meta" />
-    </div>
-  );
-}
-
-// ─── Post Card ────────────────────────────────────────────────
-function PostCard({ post }: { post: PostSummary }) {
+// ─── Post Row ─────────────────────────────────────────────────
+function PostRow({ post }: { post: PostSummary }) {
   const isNotice = post.category === 'notice';
   const isMember = post.visibility === 'member';
   const authorName = post.profiles?.name ?? '알 수 없음';
 
   return (
-    <Link href={`/posts/${post.id}`} className="post-card" style={{ textDecoration: 'none', color: 'inherit' }}>
-      {/* Badges row */}
-      <div className="post-card-badges">
-        <span className={`post-badge ${isNotice ? 'post-badge-notice' : 'post-badge-blog'}`}>
-          {isNotice ? '공지' : '블로그'}
-        </span>
+    <Link href={`/posts/${post.id}`} className="post-row" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <span className="post-row-date">{formatDate(post.created_at)}</span>
+      <span className="post-row-author">{authorName.toLowerCase()}</span>
+      <span className="post-row-title">{post.title}</span>
+      <span className="post-row-right">
         {isMember && (
-          <span className="post-badge post-badge-member">
-            <IconLock />
-            부원 공개
-          </span>
+          <span className="post-row-member">MEMBER</span>
         )}
-      </div>
-
-      {/* Title */}
-      <p className="post-card-title">{post.title}</p>
-
-      {/* Footer: author + date */}
-      <div className="post-card-footer">
-        <span className="post-card-author">{authorName}</span>
-        <span className="post-card-date">{formatDate(post.created_at)}</span>
-      </div>
+        <span className="post-row-cat">{isNotice ? 'NOTICE' : 'BLOG'}</span>
+      </span>
     </Link>
   );
 }
@@ -154,101 +92,83 @@ export default function PostList() {
   return (
     <>
       <style>{`
-        /* ── Hero ── */
+        /* ── Page Header ── */
         .posts-hero {
-          position: relative;
-          overflow: hidden;
-          padding: 5rem 1.25rem 3.5rem;
-        }
-        @media (min-width: 640px) {
-          .posts-hero { padding: 6rem 2rem 4rem; }
-        }
-        @media (min-width: 1024px) {
-          .posts-hero { padding: 7rem 2.5rem 5rem; }
-        }
-        .posts-hero-grid {
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(var(--border-soft) 1px, transparent 1px),
-            linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
-          background-size: 40px 40px;
-          mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
-          -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
-          pointer-events: none;
+          border-bottom: 1px solid var(--ink);
         }
         .posts-hero-inner {
-          position: relative;
-          max-width: 680px;
-          display: flex;
-          flex-direction: column;
+          padding: 3.5rem 0 3rem;
+          display: grid;
+          grid-template-columns: 1fr;
           gap: 0;
         }
-        .posts-hero-header {
+        @media (min-width: 900px) {
+          .posts-hero-inner {
+            grid-template-columns: 1fr 220px;
+            align-items: end;
+          }
+        }
+        .posts-hero-main {
           display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 1rem;
-          flex-wrap: wrap;
+          flex-direction: column;
+          justify-content: flex-end;
         }
         .posts-eyebrow {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.375rem;
-          padding: 0.3rem 0.875rem;
-          border-radius: 999px;
-          background: var(--accent-light);
-          color: var(--accent);
           font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-size: 0.78rem;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          margin-bottom: 1.5rem;
-          border: 1px solid var(--accent-muted);
+          color: var(--vermilion);
+          margin-bottom: 1.25rem;
         }
         .posts-hero-h1 {
-          font-size: clamp(2rem, 5vw, 3.25rem);
-          font-weight: 800;
-          letter-spacing: -0.035em;
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: clamp(2.25rem, 6vw, 3.75rem);
           line-height: 1.15;
-          color: var(--foreground);
-          margin: 0 0 1rem;
-        }
-        .posts-hero-sub {
-          font-size: 1.0625rem;
-          color: var(--text-muted);
-          line-height: 1.8;
+          letter-spacing: -0.02em;
+          color: var(--ink);
           margin: 0;
-          max-width: 480px;
         }
-        .posts-write-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.4375rem;
-          padding: 0.5625rem 1.25rem;
-          border-radius: 999px;
-          background: var(--accent);
-          color: #fff;
-          font-size: 0.875rem;
-          font-weight: 600;
-          text-decoration: none;
-          white-space: nowrap;
-          transition: background 150ms ease, box-shadow 150ms ease, transform 100ms ease;
-          box-shadow: 0 2px 8px rgb(79 70 229 / 0.22);
-          flex-shrink: 0;
-          align-self: flex-start;
+
+        /* Page-level meta (right column) */
+        .posts-hero-meta {
+          display: none;
         }
-        .posts-write-btn:hover {
-          background: var(--accent-hover);
-          box-shadow: 0 4px 14px rgb(79 70 229 / 0.33);
+        @media (min-width: 900px) {
+          .posts-hero-meta {
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--hairline);
+            padding-left: 2rem;
+            padding-bottom: 0.25rem;
+            gap: 0;
+          }
         }
-        .posts-write-btn:active { transform: translateY(1px); }
+        .posts-meta-row {
+          padding: 0.75rem 0;
+          border-bottom: 1px solid var(--hairline-soft);
+        }
+        .posts-meta-row:last-child { border-bottom: none; }
+        .posts-meta-k {
+          font-family: var(--font-mono);
+          font-size: 0.6rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
+          display: block;
+          margin-bottom: 0.15rem;
+        }
+        .posts-meta-v {
+          font-family: var(--font-mono);
+          font-size: 0.82rem;
+          color: var(--ink);
+        }
 
         /* ── Filter Tabs ── */
         .posts-tabs-wrap {
-          border-bottom: 1px solid var(--border);
-          background: var(--background);
+          border-bottom: 1px solid var(--ink);
+          background: var(--paper);
           position: sticky;
           top: 0;
           z-index: 10;
@@ -259,243 +179,234 @@ export default function PostList() {
           overflow-x: auto;
           scrollbar-width: none;
           -ms-overflow-style: none;
-          padding-inline: 1.25rem;
-          max-width: 1140px;
-          margin-inline: auto;
         }
         .posts-tabs::-webkit-scrollbar { display: none; }
-        @media (min-width: 640px) { .posts-tabs { padding-inline: 2rem; } }
-        @media (min-width: 1024px) { .posts-tabs { padding-inline: 2.5rem; } }
         .posts-tab {
           display: inline-flex;
           align-items: center;
-          gap: 0.375rem;
-          padding: 0.9375rem 0.75rem;
-          font-size: 0.9375rem;
-          font-weight: 600;
-          color: var(--text-muted);
+          padding: 0.9rem 0;
+          margin-right: 2rem;
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          font-weight: 500;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
           background: none;
           border: none;
           border-bottom: 2px solid transparent;
           margin-bottom: -1px;
           cursor: pointer;
           white-space: nowrap;
-          transition: color 150ms ease, border-color 150ms ease;
-          letter-spacing: -0.01em;
-          font-family: var(--font-sans);
+          transition: color 140ms ease, border-color 140ms ease;
         }
-        .posts-tab:hover { color: var(--foreground); }
+        .posts-tab:hover { color: var(--ink); }
         .posts-tab-active {
-          color: var(--accent);
-          border-bottom-color: var(--accent);
+          color: var(--ink);
+          border-bottom-color: var(--vermilion);
         }
-        .posts-tab-mono {
+
+        /* ── List Section ── */
+        .posts-list-section {
+          padding-bottom: 5rem;
+        }
+        .posts-list-head {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 1rem;
+          padding: 1.1rem 0;
+          border-bottom: 1px solid var(--hairline);
+        }
+        .posts-list-count {
           font-family: var(--font-mono);
           font-size: 0.7rem;
-          opacity: 0.6;
-          font-weight: 500;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
         }
 
-        /* ── Cards Section ── */
-        .posts-section {
-          padding: 3rem 1.25rem 5rem;
-        }
-        @media (min-width: 640px) { .posts-section { padding: 3.5rem 2rem 5.5rem; } }
-        @media (min-width: 1024px) { .posts-section { padding: 4rem 2.5rem 6rem; } }
-
-        /* Grid */
-        .posts-grid {
+        /* ── Post Row (archive index style) ── */
+        .post-row {
           display: grid;
+          grid-template-columns: 7rem auto 1fr auto;
+          align-items: baseline;
           gap: 1rem;
-          grid-template-columns: 1fr;
-        }
-        @media (min-width: 560px) { .posts-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 900px) { .posts-grid { grid-template-columns: repeat(3, 1fr); } }
-
-        /* ── Post Card ── */
-        .post-card {
-          background: var(--background);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-          transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+          padding: 1.1rem 0.5rem;
+          border-bottom: 1px solid var(--hairline);
+          transition: background 140ms ease;
           cursor: pointer;
         }
-        .post-card:hover {
-          box-shadow: var(--shadow);
-          transform: translateY(-2px);
-          border-color: var(--accent-muted);
+        @media (max-width: 640px) {
+          .post-row {
+            grid-template-columns: 1fr auto;
+            grid-template-rows: auto auto;
+          }
+          .post-row-date { order: 1; }
+          .post-row-author { display: none; }
+          .post-row-title { order: 2; grid-column: 1 / 2; }
+          .post-row-right { order: 3; grid-column: 2 / 3; grid-row: 1 / 3; align-self: center; }
         }
-        .post-card-badges {
-          display: flex;
-          align-items: center;
-          gap: 0.4375rem;
-          flex-wrap: wrap;
+        .post-row:hover { background: var(--ink); }
+
+        .post-row-date {
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          color: var(--ink-faint);
+          letter-spacing: 0.04em;
+          flex-shrink: 0;
+          transition: color 140ms ease;
         }
-        .post-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.3rem;
-          padding: 0.2rem 0.5625rem;
-          border-radius: 999px;
-          font-size: 0.6875rem;
-          font-weight: 600;
-          letter-spacing: 0.03em;
+        .post-row:hover .post-row-date { color: rgba(246,244,238,0.45); }
+
+        .post-row-author {
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          color: var(--ink-faint);
+          letter-spacing: 0.02em;
+          flex-shrink: 0;
           white-space: nowrap;
-        }
-        .post-badge-notice {
-          background: var(--accent-light);
-          color: var(--accent);
-        }
-        .post-badge-blog {
-          background: var(--surface-alt);
-          color: var(--text-muted);
-          border: 1px solid var(--border);
-        }
-        .post-badge-member {
-          background: #eef2ff;
-          color: #4f46e5;
-          border: 1px solid #c7d2fe;
-        }
-        .post-card-title {
-          font-size: 0.9375rem;
-          font-weight: 700;
-          letter-spacing: -0.02em;
-          color: var(--foreground);
-          line-height: 1.5;
-          margin: 0;
-          flex: 1;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
           overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 7rem;
+          transition: color 140ms ease;
         }
-        .post-card-footer {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 0.5rem;
-          margin-top: auto;
-          flex-wrap: wrap;
-        }
-        .post-card-author {
-          font-size: 0.8125rem;
-          color: var(--text-muted);
-          font-weight: 500;
-          min-width: 0;
+        .post-row:hover .post-row-author { color: rgba(246,244,238,0.35); }
+
+        .post-row-title {
+          font-family: var(--font-serif);
+          font-weight: 700;
+          font-size: 1.05rem;
+          color: var(--ink);
+          line-height: 1.35;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          transition: color 140ms ease;
         }
-        .post-card-date {
-          font-family: var(--font-mono);
-          font-size: 0.75rem;
-          color: var(--text-subtle);
-          flex-shrink: 0;
-          letter-spacing: 0.01em;
-        }
+        .post-row:hover .post-row-title { color: var(--paper); }
 
-        /* ── Skeleton ── */
-        .post-card-skeleton {
-          pointer-events: none;
-        }
-        .skel {
-          border-radius: var(--radius-sm);
-          background: linear-gradient(90deg, var(--surface-alt) 25%, var(--border-soft) 50%, var(--surface-alt) 75%);
-          background-size: 200% 100%;
-          animation: shimmer 1.4s infinite;
-        }
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        .skel-badge { height: 1.375rem; width: 3.5rem; border-radius: 999px; }
-        .skel-title { height: 1rem; width: 90%; margin-top: 0.25rem; }
-        .skel-title-short { width: 60%; }
-        .skel-meta { height: 0.75rem; width: 45%; margin-top: 0.25rem; }
-
-        /* ── Empty + Error states ── */
-        .posts-state {
-          grid-column: 1 / -1;
+        .post-row-right {
           display: flex;
-          flex-direction: column;
           align-items: center;
-          justify-content: center;
-          gap: 1rem;
-          padding: 5rem 2rem;
-          border: 1.5px dashed var(--border);
-          border-radius: var(--radius-lg);
-          text-align: center;
+          gap: 0.5rem;
+          flex-shrink: 0;
         }
-        .posts-state-icon { color: var(--text-subtle); }
-        .posts-state-title {
-          font-size: 1rem;
-          font-weight: 700;
-          color: var(--text-muted);
-          margin: 0;
-          letter-spacing: -0.02em;
-        }
-        .posts-state-sub {
+
+        .post-row-member {
           font-family: var(--font-mono);
-          font-size: 0.8125rem;
-          color: var(--text-subtle);
-          margin: 0;
-          letter-spacing: 0.01em;
+          font-size: 0.6rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--vermilion);
+          border: 1px solid var(--vermilion);
+          padding: 0.15rem 0.375rem;
+          line-height: 1.4;
+          flex-shrink: 0;
+          transition: background 140ms ease, color 140ms ease;
         }
-        .posts-state-error { border-color: #fecaca; }
-        .posts-state-error .posts-state-icon { color: #f87171; }
-        .posts-state-error .posts-state-title { color: #dc2626; }
-        .posts-state-error .posts-state-sub { color: #f87171; }
-        .posts-retry-btn {
-          display: inline-flex;
+        .post-row:hover .post-row-member {
+          background: var(--vermilion);
+          color: var(--paper);
+        }
+
+        .post-row-cat {
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: var(--vermilion);
+          white-space: nowrap;
+          transition: color 140ms ease;
+        }
+        .post-row:hover .post-row-cat { color: var(--vermilion); }
+
+        /* ── Loading state ── */
+        .posts-loading-row {
+          display: flex;
           align-items: center;
-          gap: 0.375rem;
-          padding: 0.5rem 1.125rem;
-          border-radius: 999px;
-          background: #fee2e2;
-          color: #dc2626;
-          border: 1px solid #fecaca;
-          font-size: 0.875rem;
-          font-weight: 600;
-          cursor: pointer;
-          font-family: var(--font-sans);
-          transition: background 150ms ease;
-          margin-top: 0.5rem;
+          gap: 1rem;
+          padding: 1.1rem 0.5rem;
+          border-bottom: 1px solid var(--hairline);
         }
-        .posts-retry-btn:hover { background: #fecaca; }
+        .posts-loading-bar {
+          height: 1px;
+          background: var(--hairline);
+          flex: 1;
+        }
+        .posts-loading-label {
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          letter-spacing: 0.1em;
+          color: var(--ink-faint);
+          animation: blink 1.2s step-end infinite;
+        }
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.2; }
+        }
+
+        /* ── Empty / Error states ── */
+        .posts-state {
+          padding: 3.5rem 0.5rem;
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          letter-spacing: 0.04em;
+          color: var(--ink-faint);
+        }
+        .posts-state-error {
+          color: var(--vermilion);
+        }
+        .posts-retry-btn {
+          display: inline-block;
+          margin-top: 1rem;
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--ink);
+          background: none;
+          border: 1px solid var(--ink);
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          transition: background 140ms ease, color 140ms ease;
+        }
+        .posts-retry-btn:hover {
+          background: var(--ink);
+          color: var(--paper);
+        }
+
+        /* ── Write button ── */
+        .posts-write-wrap {
+          padding-top: 0.5rem;
+        }
       `}</style>
 
-      {/* ── Hero ──────────────────────────────────────────────── */}
+      {/* ── Page Header ──────────────────────────────────────── */}
       <section className="posts-hero">
-        <div className="posts-hero-grid" />
         <div className="container-page">
           <div className="posts-hero-inner">
-            <span className="posts-eyebrow">Board</span>
-            <div className="posts-hero-header">
-              <div>
-                <h1 className="posts-hero-h1">소식</h1>
-                <p className="posts-hero-sub">
-                  세미콜론의 공지와 블로그 글을 모아봅니다.
-                </p>
-              </div>
-              {isLoggedIn && (
-                <Link href="/posts/new" className="posts-write-btn">
-                  <IconEdit />
-                  글쓰기
-                </Link>
-              )}
+            <div className="posts-hero-main rise">
+              <p className="posts-eyebrow rise rise-1">{'// POSTS — BOARD'}</p>
+              <h1 className="posts-hero-h1 rise rise-2">게시판</h1>
             </div>
+            <aside className="posts-hero-meta rise rise-3">
+              <div className="posts-meta-row">
+                <span className="posts-meta-k">Section</span>
+                <span className="posts-meta-v">POSTS</span>
+              </div>
+              <div className="posts-meta-row">
+                <span className="posts-meta-k">Type</span>
+                <span className="posts-meta-v">NOTICE / BLOG</span>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
       {/* ── Filter Tabs ─────────────────────────────────────────── */}
       <div className="posts-tabs-wrap">
-        <nav className="posts-tabs" aria-label="게시판 카테고리 필터">
+        <nav className="container-page posts-tabs" aria-label="게시판 카테고리 필터">
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -504,55 +415,70 @@ export default function PostList() {
               aria-pressed={category === tab.key}
               type="button"
             >
-              {tab.label}
-              <span className="posts-tab-mono">{tab.mono}</span>
+              {tab.mono}
             </button>
           ))}
         </nav>
       </div>
 
-      {/* ── Posts Grid ──────────────────────────────────────────── */}
-      <section className="posts-section">
+      {/* ── Post List ───────────────────────────────────────────── */}
+      <section className="posts-list-section">
         <div className="container-page">
-          <div className="posts-grid">
-            {loading ? (
-              // Skeleton placeholders
-              Array.from({ length: 6 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))
-            ) : error ? (
-              <div className="posts-state posts-state-error">
-                <span className="posts-state-icon">
-                  <IconAlertTriangle />
+          <div className="posts-list-head">
+            <span className="section-label">
+              <span className="no">●</span>
+              {category === 'notice' ? 'NOTICE' : category === 'blog' ? 'BLOG' : 'ALL POSTS'}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              {!loading && !error && (
+                <span className="posts-list-count">
+                  {posts.length} {posts.length === 1 ? 'entry' : 'entries'}
                 </span>
-                <div>
-                  <p className="posts-state-title">불러오지 못했습니다</p>
-                  <p className="posts-state-sub">{error}</p>
+              )}
+              {isLoggedIn && (
+                <div className="posts-write-wrap">
+                  <Link href="/posts/new" className="btn btn-primary">
+                    + 글쓰기
+                  </Link>
                 </div>
-                <button
-                  className="posts-retry-btn"
-                  onClick={() => fetchPosts(category)}
-                  type="button"
-                >
-                  다시 시도
-                </button>
-              </div>
-            ) : posts.length === 0 ? (
-              <div className="posts-state">
-                <span className="posts-state-icon">
-                  <IconEmpty />
-                </span>
-                <div>
-                  <p className="posts-state-title">게시글이 없어요</p>
-                  <p className="posts-state-sub">// no posts found</p>
-                </div>
-              </div>
-            ) : (
-              posts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))
-            )}
+              )}
+            </div>
           </div>
+
+          {loading ? (
+            // Loading: hairline rows + blinking mono label
+            <div>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="posts-loading-row">
+                  <div className="posts-loading-bar" />
+                  {i === 0 && (
+                    <span className="posts-loading-label">{'// loading...'}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="posts-state posts-state-error">
+              <p>{'// 오류: '}{error}</p>
+              <button
+                className="posts-retry-btn"
+                onClick={() => fetchPosts(category)}
+                type="button"
+              >
+                RETRY
+              </button>
+            </div>
+          ) : posts.length === 0 ? (
+            <div className="posts-state">
+              <p>{'// 게시글이 없습니다'}</p>
+            </div>
+          ) : (
+            <div>
+              {posts.map((post) => (
+                <PostRow key={post.id} post={post} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </>
