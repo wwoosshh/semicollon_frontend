@@ -6,24 +6,17 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth-provider';
 
 const NAV_LINKS = [
-  { href: '/about',      label: '소개' },
-  { href: '/activities', label: '활동' },
-  { href: '/posts',      label: '소식' },
-  { href: '/recruit',    label: '모집' },
+  { href: '/about',      no: '01', label: '소개' },
+  { href: '/activities', no: '02', label: '활동' },
+  { href: '/posts',      no: '03', label: '소식' },
+  { href: '/recruit',    no: '04', label: '모집' },
 ] as const;
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const { session, profile, loading, signOut } = useAuth();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -35,279 +28,240 @@ export default function Header() {
     router.push('/');
   };
 
-  // Displayed name: profile.name or email fallback
   const displayName = profile?.name ?? session?.user?.email ?? '';
 
   return (
-    <header
-      style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        background: scrolled ? 'rgba(255,255,255,0.88)' : 'rgba(255,255,255,1)',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-        transition: 'background 250ms ease, border-color 250ms ease, backdrop-filter 250ms ease',
-      }}
-    >
+    <header className="site-header">
+      <style>{`
+        .site-header {
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          background: var(--paper);
+          border-bottom: 1px solid var(--ink);
+        }
+        .hd-row {
+          display: flex;
+          align-items: stretch;
+          justify-content: space-between;
+          height: 3.5rem;
+        }
+        .hd-logo {
+          display: flex;
+          align-items: center;
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: 1.1875rem;
+          letter-spacing: -0.01em;
+          color: var(--ink);
+          text-decoration: none;
+        }
+        .hd-logo .semi {
+          font-family: var(--font-mono);
+          color: var(--vermilion);
+          margin-left: 1px;
+        }
+        .hd-nav {
+          align-items: stretch;
+        }
+        .hd-link {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          padding: 0 1.1rem;
+          font-family: var(--font-mono);
+          font-size: 0.78rem;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          text-decoration: none;
+          color: var(--ink-soft);
+          border-left: 1px solid var(--hairline-soft);
+          transition: background 140ms ease, color 140ms ease;
+        }
+        .hd-link:last-child {
+          border-right: 1px solid var(--hairline-soft);
+        }
+        .hd-link .no {
+          font-size: 0.66rem;
+          color: var(--ink-faint);
+          transition: color 140ms ease;
+        }
+        .hd-link:hover {
+          background: var(--ink);
+          color: var(--paper);
+        }
+        .hd-link:hover .no { color: var(--vermilion); }
+        .hd-link.active {
+          color: var(--ink);
+          box-shadow: inset 0 -2px 0 var(--vermilion);
+        }
+        .hd-link.active .no { color: var(--vermilion); }
+        .hd-auth {
+          display: flex;
+          align-items: center;
+          gap: 0.875rem;
+        }
+        .hd-user {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          color: var(--ink-soft);
+          white-space: nowrap;
+          max-width: 9rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .hd-authlink {
+          font-family: var(--font-mono);
+          font-size: 0.78rem;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: var(--ink);
+          text-decoration: none;
+          border: 1px solid var(--ink);
+          border-radius: var(--radius);
+          padding: 0.45rem 0.9rem;
+          background: transparent;
+          cursor: pointer;
+          transition: background 140ms ease, color 140ms ease;
+        }
+        .hd-authlink:hover {
+          background: var(--ink);
+          color: var(--paper);
+        }
+        .hd-burger {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          width: 2.5rem;
+          height: 2.5rem;
+          align-self: center;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 0.5rem;
+          gap: 5px;
+        }
+        .hd-burger span {
+          display: block;
+          width: 20px;
+          height: 2px;
+          background: var(--ink);
+          transition: transform 200ms ease, opacity 200ms ease;
+        }
+        .hd-drawer {
+          overflow: hidden;
+          transition: max-height 300ms cubic-bezier(0.4, 0, 0.2, 1);
+          border-top: 1px solid var(--hairline);
+          background: var(--paper);
+        }
+        .hd-drawer-link {
+          display: flex;
+          align-items: baseline;
+          gap: 0.875rem;
+          padding: 1rem 0.25rem;
+          border-bottom: 1px solid var(--hairline-soft);
+          text-decoration: none;
+        }
+        .hd-drawer-link .no {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          color: var(--vermilion);
+        }
+        .hd-drawer-link .label {
+          font-family: var(--font-serif);
+          font-weight: 700;
+          font-size: 1.25rem;
+          color: var(--ink);
+        }
+        .hd-drawer-link.active .label {
+          color: var(--vermilion);
+        }
+      `}</style>
+
       <div className="container-page">
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            height: '3.75rem',
-          }}
-        >
+        <div className="hd-row">
           {/* Logo */}
-          <Link
-            href="/"
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontWeight: 700,
-              fontSize: '1.25rem',
-              letterSpacing: '-0.03em',
-              color: 'var(--foreground)',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0,
-            }}
-          >
-            Semicollon<span style={{ color: 'var(--accent)' }}>;</span>
+          <Link href="/" className="hd-logo">
+            세미콜론<span className="semi">;</span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav
-            style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-            className="hidden md:flex"
-          >
-            {NAV_LINKS.map(({ href, label }) => {
-              const isActive = pathname.startsWith(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  style={{
-                    padding: '0.4375rem 0.875rem',
-                    borderRadius: '999px',
-                    fontSize: '0.9375rem',
-                    fontWeight: isActive ? 600 : 500,
-                    color: isActive ? 'var(--accent)' : 'var(--text-muted)',
-                    background: isActive ? 'var(--accent-light)' : 'transparent',
-                    textDecoration: 'none',
-                    transition: 'color 150ms ease, background 150ms ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLAnchorElement).style.color =
-                        'var(--foreground)';
-                      (e.currentTarget as HTMLAnchorElement).style.background =
-                        'var(--surface)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLAnchorElement).style.color =
-                        'var(--text-muted)';
-                      (e.currentTarget as HTMLAnchorElement).style.background =
-                        'transparent';
-                    }
-                  }}
-                >
-                  {label}
-                </Link>
-              );
-            })}
+          <nav className="hd-nav hidden md:flex">
+            {NAV_LINKS.map(({ href, no, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`hd-link${pathname.startsWith(href) ? ' active' : ''}`}
+              >
+                <span className="no">{no}</span>
+                {label}
+              </Link>
+            ))}
           </nav>
 
-          {/* Right side: Auth + Hamburger */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            {/* Desktop auth buttons */}
-            {!loading && (
-              session ? (
-                <div className="hidden md:flex" style={{ alignItems: 'center', gap: '0.5rem' }}>
-                  <span
-                    style={{
-                      fontSize: '0.9rem',
-                      color: 'var(--text-muted)',
-                      fontWeight: 500,
-                      whiteSpace: 'nowrap',
-                      maxWidth: '10rem',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {displayName}님
-                  </span>
-                  <button
-                    onClick={handleSignOut}
-                    className="btn btn-ghost"
-                    style={{ padding: '0.5rem 1.125rem', fontSize: '0.9rem' }}
-                    type="button"
-                  >
+          {/* Right: auth + hamburger */}
+          <div className="hd-auth">
+            {!loading &&
+              (session ? (
+                <div className="hidden md:flex" style={{ alignItems: 'center', gap: '0.75rem' }}>
+                  <span className="hd-user">{displayName}</span>
+                  <button onClick={handleSignOut} className="hd-authlink" type="button">
+                    로그아웃
+                  </button>
+                </div>
+              ) : (
+                <Link href="/login" className="hd-authlink hidden md:inline-flex">
+                  로그인
+                </Link>
+              ))}
+
+            <button
+              className="hd-burger md:hidden"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
+              aria-expanded={menuOpen}
+            >
+              <span style={{ transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
+              <span style={{ opacity: menuOpen ? 0 : 1 }} />
+              <span style={{ transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
+      <div className="hd-drawer md:hidden" style={{ maxHeight: menuOpen ? '480px' : '0' }}>
+        <nav className="container-page" style={{ padding: '0.5rem 1.25rem 1.25rem' }}>
+          {NAV_LINKS.map(({ href, no, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`hd-drawer-link${pathname.startsWith(href) ? ' active' : ''}`}
+            >
+              <span className="no">{no}</span>
+              <span className="label">{label}</span>
+            </Link>
+          ))}
+          <div style={{ paddingTop: '1rem' }}>
+            {!loading &&
+              (session ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span className="hd-user">{displayName}</span>
+                  <button onClick={handleSignOut} className="hd-authlink" type="button">
                     로그아웃
                   </button>
                 </div>
               ) : (
                 <Link
                   href="/login"
-                  className="hidden md:inline-flex btn btn-ghost"
-                  style={{ padding: '0.5rem 1.125rem', fontSize: '0.9rem' }}
+                  className="hd-authlink"
+                  style={{ display: 'inline-flex', width: '100%', justifyContent: 'center' }}
                 >
                   로그인
                 </Link>
-              )
-            )}
-
-            {/* Hamburger button (mobile only) */}
-            <button
-              className="md:hidden"
-              onClick={() => setMenuOpen((prev) => !prev)}
-              aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
-              aria-expanded={menuOpen}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '2.5rem',
-                height: '2.5rem',
-                borderRadius: 'var(--radius)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '0.5rem',
-                gap: '5px',
-              }}
-            >
-              <span
-                style={{
-                  display: 'block',
-                  width: '20px',
-                  height: '2px',
-                  background: 'var(--foreground)',
-                  borderRadius: '2px',
-                  transition: 'transform 200ms ease, opacity 200ms ease',
-                  transform: menuOpen
-                    ? 'translateY(7px) rotate(45deg)'
-                    : 'none',
-                }}
-              />
-              <span
-                style={{
-                  display: 'block',
-                  width: '20px',
-                  height: '2px',
-                  background: 'var(--foreground)',
-                  borderRadius: '2px',
-                  transition: 'opacity 200ms ease',
-                  opacity: menuOpen ? 0 : 1,
-                }}
-              />
-              <span
-                style={{
-                  display: 'block',
-                  width: '20px',
-                  height: '2px',
-                  background: 'var(--foreground)',
-                  borderRadius: '2px',
-                  transition: 'transform 200ms ease, opacity 200ms ease',
-                  transform: menuOpen
-                    ? 'translateY(-7px) rotate(-45deg)'
-                    : 'none',
-                }}
-              />
-            </button>
+              ))}
           </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu Drawer */}
-      <div
-        className="md:hidden"
-        style={{
-          overflow: 'hidden',
-          maxHeight: menuOpen ? '480px' : '0',
-          transition: 'max-height 300ms cubic-bezier(0.4, 0, 0.2, 1)',
-          borderTop: menuOpen ? '1px solid var(--border)' : 'none',
-        }}
-      >
-        <nav style={{ padding: '0.75rem 1.25rem 1rem' }}>
-          <ul
-            style={{
-              listStyle: 'none',
-              margin: 0,
-              padding: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.25rem',
-            }}
-          >
-            {NAV_LINKS.map(({ href, label }) => {
-              const isActive = pathname.startsWith(href);
-              return (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    style={{
-                      display: 'block',
-                      padding: '0.6875rem 1rem',
-                      borderRadius: 'var(--radius)',
-                      fontSize: '1rem',
-                      fontWeight: isActive ? 600 : 500,
-                      color: isActive ? 'var(--accent)' : 'var(--foreground)',
-                      background: isActive ? 'var(--accent-light)' : 'transparent',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    {label}
-                  </Link>
-                </li>
-              );
-            })}
-            <li
-              style={{
-                marginTop: '0.5rem',
-                paddingTop: '0.75rem',
-                borderTop: '1px solid var(--border-soft)',
-              }}
-            >
-              {!loading && (
-                session ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <span
-                      style={{
-                        fontSize: '0.875rem',
-                        color: 'var(--text-muted)',
-                        fontWeight: 500,
-                        padding: '0 0.25rem',
-                      }}
-                    >
-                      {displayName}님
-                    </span>
-                    <button
-                      onClick={handleSignOut}
-                      className="btn btn-ghost"
-                      style={{ width: '100%', justifyContent: 'center' }}
-                      type="button"
-                    >
-                      로그아웃
-                    </button>
-                  </div>
-                ) : (
-                  <Link
-                    href="/login"
-                    className="btn btn-ghost"
-                    style={{ width: '100%', justifyContent: 'center' }}
-                  >
-                    로그인
-                  </Link>
-                )
-              )}
-            </li>
-          </ul>
         </nav>
       </div>
     </header>

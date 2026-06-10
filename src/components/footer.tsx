@@ -1,125 +1,129 @@
 import Link from 'next/link';
 
+const NAV = [
+  { href: '/about',      no: '01', label: '소개' },
+  { href: '/activities', no: '02', label: '활동' },
+  { href: '/posts',      no: '03', label: '소식' },
+  { href: '/recruit',    no: '04', label: '모집' },
+] as const;
+
 export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer
-      style={{
-        borderTop: '1px solid var(--border)',
-        background: 'var(--surface)',
-        marginTop: 'auto',
-      }}
-    >
+    <footer className="ink-block" style={{ marginTop: 'auto' }}>
       <style>{`
-        .footer-link {
-          font-size: 0.9rem;
-          color: var(--text-muted);
-          text-decoration: none;
-          transition: color 150ms ease;
+        .ft-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 2.5rem;
+          padding: 3.5rem 0 2.5rem;
         }
-        .footer-link:hover {
-          color: var(--foreground);
+        @media (min-width: 768px) {
+          .ft-grid {
+            grid-template-columns: 1.4fr 1fr 1fr;
+            gap: 2rem;
+          }
         }
-        .footer-github {
+        .ft-wordmark {
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: clamp(2rem, 5vw, 2.75rem);
+          letter-spacing: -0.01em;
+          color: var(--paper);
+          line-height: 1.1;
+        }
+        .ft-wordmark .semi {
+          font-family: var(--font-mono);
+          color: var(--vermilion);
+        }
+        .ft-tag {
+          margin-top: 0.875rem;
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          letter-spacing: 0.08em;
+          color: rgba(246, 244, 238, 0.55);
+        }
+        .ft-h {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          font-weight: 500;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--vermilion);
+          margin-bottom: 1rem;
+        }
+        .ft-link {
           display: flex;
-          align-items: center;
-          gap: 0.375rem;
-          font-size: 0.9rem;
-          color: var(--text-muted);
+          align-items: baseline;
+          gap: 0.625rem;
+          padding: 0.375rem 0;
+          font-size: 0.95rem;
+          color: rgba(246, 244, 238, 0.85);
           text-decoration: none;
-          transition: color 150ms ease;
+          transition: color 140ms ease;
+          width: fit-content;
         }
-        .footer-github:hover {
-          color: var(--foreground);
+        .ft-link .no {
+          font-family: var(--font-mono);
+          font-size: 0.66rem;
+          color: rgba(246, 244, 238, 0.4);
+        }
+        .ft-link:hover { color: var(--vermilion); }
+        .ft-colophon {
+          border-top: 1px solid rgba(246, 244, 238, 0.18);
+          padding: 1.25rem 0 2rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem 2rem;
+          justify-content: space-between;
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          letter-spacing: 0.04em;
+          color: rgba(246, 244, 238, 0.45);
         }
       `}</style>
 
       <div className="container-page">
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.25rem',
-            padding: '2.5rem 0',
-          }}
-        >
-          {/* Top row */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.875rem',
-            }}
-            className="sm:flex-row sm:items-center sm:justify-between"
-          >
-            {/* Logo */}
-            <span
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 700,
-                fontSize: '1.0625rem',
-                letterSpacing: '-0.03em',
-                color: 'var(--foreground)',
-              }}
-            >
-              Semicollon<span style={{ color: 'var(--accent)' }}>;</span>
-            </span>
-
-            {/* Links */}
-            <nav
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1.25rem',
-                flexWrap: 'wrap',
-              }}
-            >
-              {[
-                { href: '/about',      label: '소개' },
-                { href: '/activities', label: '활동' },
-                { href: '/posts',      label: '소식' },
-                { href: '/recruit',    label: '모집' },
-              ].map(({ href, label }) => (
-                <Link key={href} href={href} className="footer-link">
-                  {label}
-                </Link>
-              ))}
-
-              <a
-                href="https://github.com/wwoosshh/semicollon_frontend"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="footer-github"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-                </svg>
-                GitHub
-              </a>
-            </nav>
+        <div className="ft-grid">
+          <div>
+            <div className="ft-wordmark">
+              세미콜론<span className="semi">;</span>
+            </div>
+            <p className="ft-tag">PROGRAMMING CLUB — SEMICOLLON</p>
           </div>
 
-          {/* Divider */}
-          <div style={{ height: '1px', background: 'var(--border)' }} />
+          <nav>
+            <div className="ft-h">Index</div>
+            {NAV.map(({ href, no, label }) => (
+              <Link key={href} href={href} className="ft-link">
+                <span className="no">{no}</span>
+                {label}
+              </Link>
+            ))}
+          </nav>
 
-          {/* Copyright */}
-          <p
-            style={{
-              fontSize: '0.85rem',
-              color: 'var(--text-subtle)',
-              margin: 0,
-              lineHeight: 1.5,
-            }}
-          >
-            &copy; {year} 세미콜론 동아리 (Semicollon). All rights reserved.
-          </p>
+          <div>
+            <div className="ft-h">Elsewhere</div>
+            <a
+              href="https://github.com/wwoosshh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ft-link"
+            >
+              <span className="no">↗</span>
+              GitHub
+            </a>
+            <Link href="/recruit/apply" className="ft-link">
+              <span className="no">↗</span>
+              지원하기
+            </Link>
+          </div>
+        </div>
+
+        <div className="ft-colophon">
+          <span>&copy; {year} SEMICOLLON. ALL RIGHTS RESERVED.</span>
+          <span>SET IN NOTO SERIF KR &amp; IBM PLEX MONO</span>
         </div>
       </div>
     </footer>
