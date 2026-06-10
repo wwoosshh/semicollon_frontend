@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { api, ApiError } from '@/lib/api';
+import { api } from '@/lib/api';
 import type { Activity } from '@/lib/types';
 
 // ─── Data ─────────────────────────────────────────────────────
@@ -63,8 +63,8 @@ export default async function ActivityDetailPage({
   let activity: Activity;
   try {
     activity = await fetchActivity(id);
-  } catch (e) {
-    if (e instanceof ApiError && e.status === 404) notFound();
+  } catch {
+    // 404든 일시적 오류든 상세를 보여줄 수 없으므로 동일하게 처리
     notFound();
   }
 
