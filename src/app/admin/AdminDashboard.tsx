@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth-provider';
 import { api, ApiError } from '@/lib/api';
 import type { Application, RecruitInfo } from '@/lib/types';
+import AboutManager from './AboutManager';
+import ActivitiesManager from './ActivitiesManager';
 
 // ─── Types ────────────────────────────────────────────────────
-type Tab = 'applications' | 'recruit' | 'invite';
+type Tab = 'applications' | 'recruit' | 'invite' | 'about' | 'activities';
 type StatusFilter = 'all' | 'pending' | 'accepted' | 'rejected';
 
 // ─── Icons ────────────────────────────────────────────────────
@@ -55,6 +57,24 @@ function IconKey() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4" />
+    </svg>
+  );
+}
+
+function IconInfo() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="8" strokeWidth="2.5" />
+      <line x1="12" y1="12" x2="12" y2="16" />
+    </svg>
+  );
+}
+
+function IconActivity() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
     </svg>
   );
 }
@@ -716,6 +736,8 @@ export default function AdminDashboard() {
     { id: 'applications', label: '지원자 관리', icon: <IconUsers /> },
     { id: 'recruit', label: '모집 설정', icon: <IconCalendar /> },
     { id: 'invite', label: '초대 코드', icon: <IconKey /> },
+    { id: 'about', label: '소개 관리', icon: <IconInfo /> },
+    { id: 'activities', label: '활동 관리', icon: <IconActivity /> },
   ];
 
   return (
@@ -755,6 +777,8 @@ export default function AdminDashboard() {
               {activeTab === 'applications' && <ApplicationsTab token={token} />}
               {activeTab === 'recruit' && <RecruitTab token={token} />}
               {activeTab === 'invite' && <InviteTab token={token} />}
+              {activeTab === 'about' && <AboutManager token={token} />}
+              {activeTab === 'activities' && <ActivitiesManager token={token} />}
             </div>
           </div>
         </div>
