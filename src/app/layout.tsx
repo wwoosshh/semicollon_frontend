@@ -30,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
+        <div className="scroll-progress" aria-hidden="true" />
         <AuthProvider>
           <Header />
           <main style={{ flex: 1 }}>{children}</main>

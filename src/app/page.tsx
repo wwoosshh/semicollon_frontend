@@ -50,6 +50,26 @@ const DOINGS = [
   },
 ] as const;
 
+// ─── 활자 조판 리빌: 글자 단위 스태거 ─────────────────────────
+function TypesetLine({ text, offset }: { text: string; offset: number }) {
+  return (
+    <>
+      {Array.from(text).map((ch, i) => (
+        <span
+          key={i}
+          className="typeset-ch"
+          style={{ ['--ch-i' as string]: offset + i }}
+        >
+          {ch === ' ' ? ' ' : ch}
+        </span>
+      ))}
+    </>
+  );
+}
+
+const HEAD_L1 = '한 줄의 끝에서,';
+const HEAD_L2 = '같이 다음 줄을 쓴다';
+
 // ─── Page ─────────────────────────────────────────────────────
 export default async function Home() {
   const [posts, recruit] = await Promise.all([fetchRecentPosts(), fetchRecruitInfo()]);
@@ -171,6 +191,20 @@ export default async function Home() {
           .hero-glyph { right: 296px; }
         }
         .hero-main, .hero-meta { position: relative; z-index: 1; }
+        /* 글리프 스크롤 패럴랙스 — 스크롤하면 천천히 가라앉는다 */
+        @supports (animation-timeline: scroll()) {
+          .hero-glyph {
+            animation: glyph-drift linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0px 900px;
+          }
+        }
+        @keyframes glyph-drift {
+          to { transform: translateY(110px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-glyph { animation: none; }
+        }
 
         /* ── 섹션 공통 ── */
         .sec {
@@ -331,10 +365,18 @@ export default async function Home() {
           <div className="hero-grid">
             <div className="hero-main">
               <p className="hero-eyebrow rise rise-1">{'// 프로그래밍 동아리, 세미콜론'}</p>
-              <h1 className="hero-title rise rise-2">
-                한 줄의 끝에서,
-                <br />
-                같이 다음 줄을 쓴다<span className="semi">;</span>
+              <h1 className="hero-title" aria-label={`${HEAD_L1} ${HEAD_L2};`}>
+                <span aria-hidden="true">
+                  <TypesetLine text={HEAD_L1} offset={0} />
+                  <br />
+                  <TypesetLine text={HEAD_L2} offset={HEAD_L1.length} />
+                  <span
+                    className="semi typeset-caret"
+                    style={{ ['--ch-i' as string]: HEAD_L1.length + HEAD_L2.length }}
+                  >
+                    ;
+                  </span>
+                </span>
               </h1>
               <p className="hero-sub rise rise-3">
                 세미콜론은 함께 코드를 읽고, 만들고, 기록하는 사람들의 모임입니다.
@@ -380,7 +422,7 @@ export default async function Home() {
           </div>
           <div className="doing-grid">
             {DOINGS.map((d) => (
-              <article key={d.no} className="doing">
+              <article key={d.no} className="doing vt-rise">
                 <div className="doing-no">{d.no}</div>
                 <h2 className="doing-title">{d.title}</h2>
                 <div className="doing-en">{d.en}</div>
@@ -405,7 +447,7 @@ export default async function Home() {
           {posts.length > 0 ? (
             <div>
               {posts.map((post) => (
-                <Link key={post.id} href={`/posts/${post.id}`} className="news-row">
+                <Link key={post.id} href={`/posts/${post.id}`} className="news-row vt-rise">
                   <span className="news-date">{formatDate(post.created_at)}</span>
                   <span className="news-title">{post.title}</span>
                   <span className="news-cat">
@@ -419,6 +461,29 @@ export default async function Home() {
           )}
         </div>
       </section>
+
+      {/* ── 활자 티커 (인쇄 띠지) ────────────────────────────── */}
+      <div className="ticker" aria-hidden="true">
+        <div className="ticker-track">
+          {[0, 1].map((n) => (
+            <div key={n} className="ticker-item">
+              <span>
+                SEMICOLLON<span className="tick-semi">;</span>
+              </span>
+              <span>STUDY</span>
+              <span className="tick-semi">●</span>
+              <span>PROJECT</span>
+              <span className="tick-semi">●</span>
+              <span>EVENT</span>
+              <span className="tick-semi">●</span>
+              <span>WE WRITE THE NEXT LINE TOGETHER</span>
+              <span className="tick-semi">●</span>
+              <span>한 줄의 끝에서, 같이 다음 줄을</span>
+              <span className="tick-semi">●</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ── 03 모집 ──────────────────────────────────────────── */}
       <section className={isRecruiting ? 'ink-block' : undefined}>

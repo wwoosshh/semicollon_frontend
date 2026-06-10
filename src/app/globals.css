@@ -245,8 +245,232 @@ code, kbd, pre, samp {
 .rise-3 { animation-delay: 220ms; }
 .rise-4 { animation-delay: 300ms; }
 
+/* ════════════════════════════════════════════════════════════════
+   모션 레이어 — "움직이는 인쇄물"
+   스크롤 스크럽 리빌, 잉크 스와이프, 활자 조판, 타자기 로딩.
+   모두 CSS 전용. 미지원 브라우저는 정적 폴백, reduced-motion 전면 대응.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── 스크롤 진행 괘선 (상단 2px 버밀리온 잉크) ─────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--vermilion);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  z-index: 200;
+  pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation: scroll-progress-kf linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes scroll-progress-kf {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ── 스크롤 스크럽 리빌 — 보일 때 조판되고, 되감으면 풀린다 ──
+   사용: 목록 행·카드에 .vt-rise, 괘선에 .vt-rule */
+@supports (animation-timeline: view()) {
+  .vt-rise {
+    animation: vt-rise-kf cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 70%;
+  }
+  .vt-rule {
+    transform-origin: left center;
+    animation: vt-rule-kf cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 100%;
+  }
+}
+
+@keyframes vt-rise-kf {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vt-rule-kf {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ── 잉크 스와이프 — 버튼·내비 호버가 왼쪽부터 차오른다 ────── */
+.btn {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: -1;
+}
+
+.btn:hover::before {
+  transform: scaleX(1);
+}
+
+.btn-primary::before { background: var(--vermilion); }
+.btn-primary:hover {
+  background: var(--ink); /* 스와이프가 덮기 전 기존 배경 유지 */
+  border-color: var(--vermilion);
+  color: #fff;
+}
+
+.btn-ghost::before { background: var(--ink); }
+.btn-ghost:hover {
+  background: transparent;
+  color: var(--paper);
+}
+
+/* ── 타자기 로딩 — `// loading` 뒤에 점이 타이핑된다 ────────── */
+.loading-line {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+}
+
+.loading-line::after {
+  content: '';
+  display: inline-block;
+  width: 3ch;
+  text-align: left;
+  animation: typing-dots 1.2s steps(1) infinite;
+}
+
+.loading-line::before {
+  content: '▍';
+  color: var(--vermilion);
+  margin-right: 0.5ch;
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+@keyframes typing-dots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+}
+
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+/* ── 활자 조판 리빌 (히어로 헤드라인 글자 단위) ─────────────── */
+.typeset-ch {
+  display: inline-block;
+  animation: typeset-ch-kf 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--ch-i, 0) * 42ms);
+}
+
+@keyframes typeset-ch-kf {
+  from { opacity: 0; transform: translateY(0.42em); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 헤드라인 끝의 세미콜론 = 터미널 커서 (조판이 끝난 뒤 깜빡인다) */
+.typeset-caret {
+  animation: caret-blink 1.05s steps(1) 1.3s 5, typeset-ch-kf 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 1.3s, calc(var(--ch-i, 0) * 42ms);
+}
+
+/* ── 활자 티커 (인쇄 띠지) ──────────────────────────────────── */
+.ticker {
+  overflow: hidden;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  background: var(--paper);
+  padding: 0.8rem 0;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  gap: 0;
+  animation: ticker-kf 30s linear infinite;
+  will-change: transform;
+}
+
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+.ticker-item {
+  display: flex;
+  align-items: baseline;
+  gap: 2.5rem;
+  padding-right: 2.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.ticker-item .tick-semi {
+  color: var(--vermilion);
+}
+
+@keyframes ticker-kf {
+  to { transform: translateX(-50%); }
+}
+
+/* ── 오버레이 등장 (캘린더 모달 등) ─────────────────────────── */
+@keyframes overlay-backdrop-kf {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes overlay-panel-kf {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.overlay-backdrop-anim { animation: overlay-backdrop-kf 200ms ease both; }
+.overlay-panel-anim    { animation: overlay-panel-kf 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ── 포커스 가시성 (키보드 사용자) ──────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--vermilion);
+  outline-offset: 2px;
+}
+
+/* ── 모션 최소화 선호 시 전부 정지 ──────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .rise, .rise-1, .rise-2, .rise-3, .rise-4 {
-    animation: none;
+  .rise, .rise-1, .rise-2, .rise-3, .rise-4,
+  .vt-rise, .vt-rule,
+  .typeset-ch, .typeset-caret,
+  .scroll-progress,
+  .overlay-backdrop-anim, .overlay-panel-anim {
+    animation: none !important;
+  }
+  .ticker-track {
+    animation: none !important;
+  }
+  .loading-line::before,
+  .loading-line::after {
+    animation: none !important;
+    content: '...';
+  }
+  .btn::before {
+    transition: none !important;
   }
 }

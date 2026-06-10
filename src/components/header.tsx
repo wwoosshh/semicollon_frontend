@@ -61,6 +61,15 @@ export default function Header() {
           font-family: var(--font-mono);
           color: var(--vermilion);
           margin-left: 1px;
+          /* 가끔 터미널 커서처럼 깜빡인다 — 5초 주기 중 끝 0.6초만 */
+          animation: hd-semi-blink 5s steps(1) infinite;
+        }
+        @keyframes hd-semi-blink {
+          0%, 88%, 94% { opacity: 1; }
+          91%, 97%     { opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hd-logo .semi { animation: none; }
         }
         .hd-nav {
           display: none;
