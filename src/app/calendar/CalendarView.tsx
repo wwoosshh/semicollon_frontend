@@ -94,9 +94,9 @@ function EventModal({
   }, [onClose]);
 
   return (
-    <div className="cal-modal-backdrop" onClick={onClose} role="dialog" aria-modal="true">
+    <div className="cal-modal-backdrop overlay-backdrop-anim" onClick={onClose} role="dialog" aria-modal="true">
       <div
-        className="cal-modal"
+        className="cal-modal overlay-panel-anim"
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
@@ -559,11 +559,6 @@ export default function CalendarView() {
           font-size: 0.68rem;
           letter-spacing: 0.1em;
           color: var(--ink-faint);
-          animation: blink 1.2s step-end infinite;
-        }
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0.2; }
         }
         .cal-retry-btn {
           margin-top: 1rem;
@@ -836,12 +831,13 @@ export default function CalendarView() {
 
             {loading ? (
               <div>
-                {Array.from({ length: 4 }).map((_, i) => (
+                <div className="cal-loading-row">
+                  <div className="cal-loading-bar" />
+                  <div className="loading-line">{'// loading'}</div>
+                </div>
+                {Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="cal-loading-row">
                     <div className="cal-loading-bar" />
-                    {i === 0 && (
-                      <span className="cal-loading-label">{'// loading...'}</span>
-                    )}
                   </div>
                 ))}
               </div>
@@ -869,7 +865,7 @@ export default function CalendarView() {
                   return (
                     <div
                       key={ev.id}
-                      className="cal-index-row"
+                      className="cal-index-row vt-rise"
                       onClick={() => openModal(evDate, allDayEvents)}
                       role="button"
                       tabIndex={0}

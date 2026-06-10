@@ -365,7 +365,7 @@ export default function Comments({ postId }: { postId: string }) {
 
         {/* Comment list */}
         {loadingComments ? (
-          <div className="cmt-status">{'// loading...'}</div>
+          <div className="cmt-status"><div className="loading-line">{'// loading'}</div></div>
         ) : fetchError ? (
           <div className={`cmt-status cmt-error-text`}>{fetchError}</div>
         ) : comments.length === 0 ? (

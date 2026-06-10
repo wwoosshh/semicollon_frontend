@@ -32,7 +32,7 @@ function PostRow({ post }: { post: PostSummary }) {
   const authorName = post.profiles?.name ?? '알 수 없음';
 
   return (
-    <Link href={`/posts/${post.id}`} className="post-row" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link href={`/posts/${post.id}`} className="post-row vt-rise" style={{ textDecoration: 'none', color: 'inherit' }}>
       <span className="post-row-date">{formatDate(post.created_at)}</span>
       <span className="post-row-author">{authorName.toLowerCase()}</span>
       <span className="post-row-title">{post.title}</span>
@@ -334,17 +334,6 @@ export default function PostList() {
           background: var(--hairline);
           flex: 1;
         }
-        .posts-loading-label {
-          font-family: var(--font-mono);
-          font-size: 0.68rem;
-          letter-spacing: 0.1em;
-          color: var(--ink-faint);
-          animation: blink 1.2s step-end infinite;
-        }
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.2; }
-        }
 
         /* ── Empty / Error states ── */
         .posts-state {
@@ -446,14 +435,15 @@ export default function PostList() {
           </div>
 
           {loading ? (
-            // Loading: hairline rows + blinking mono label
+            // Loading: hairline rows + global loading-line
             <div>
-              {Array.from({ length: 6 }).map((_, i) => (
+              <div className="posts-loading-row">
+                <div className="posts-loading-bar" />
+                <div className="loading-line">{'// loading'}</div>
+              </div>
+              {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="posts-loading-row">
                   <div className="posts-loading-bar" />
-                  {i === 0 && (
-                    <span className="posts-loading-label">{'// loading...'}</span>
-                  )}
                 </div>
               ))}
             </div>

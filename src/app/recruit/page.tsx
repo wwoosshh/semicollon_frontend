@@ -461,7 +461,7 @@ export default async function RecruitPage() {
               <div className="rc-sec-body" style={{ paddingBottom: '2rem' }}>
                 <ul className="elig-list">
                   {ELIGIBILITY.map((item, idx) => (
-                    <li key={item} className="elig-item">
+                    <li key={item} className="elig-item vt-rise">
                       <span className="elig-no">{String(idx + 1).padStart(2, '0')}</span>
                       <span className="elig-text">{item}</span>
                     </li>
@@ -483,7 +483,7 @@ export default async function RecruitPage() {
               <div className="rc-sec-body">
                 <div className="steps-grid">
                   {STEPS.map((step) => (
-                    <div key={step.no} className="step-col">
+                    <div key={step.no} className="step-col vt-rise">
                       <div className="step-no">STEP {step.no}</div>
                       <h2 className="step-label">{step.label}</h2>
                       <p className="step-desc">{step.desc}</p>

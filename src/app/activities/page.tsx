@@ -41,7 +41,7 @@ function ActivityRow({ activity, index }: { activity: Activity; index: number })
   const idx = String(index + 1).padStart(2, '0');
 
   return (
-    <Link href={`/activities/${activity.id}`} className="act-row" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link href={`/activities/${activity.id}`} className="act-row vt-rise" style={{ textDecoration: 'none', color: 'inherit' }}>
       {/* Left column: index + meta + title */}
       <div className="act-row-main">
         <span className="act-row-idx" aria-hidden="true">{idx}</span>

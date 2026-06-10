@@ -462,7 +462,7 @@ export default async function AboutPage() {
               <table className="history-table">
                 <tbody>
                   {historyEntries.map((entry) => (
-                    <tr key={entry.year} className="history-year-row">
+                    <tr key={entry.year} className="history-year-row vt-rise">
                       <td className="history-year">{entry.year}</td>
                       <td className="history-items">
                         {entry.items.map((item, idx) => (
@@ -500,7 +500,7 @@ export default async function AboutPage() {
             ) : (
               <div className="staff-table">
                 {about.staff.map((member, idx) => (
-                  <div key={member.name} className="staff-row">
+                  <div key={member.name} className="staff-row vt-rise">
                     <span className="staff-idx">{String(idx + 1).padStart(2, '0')}</span>
                     <div className="staff-name-cell">
                       <span className="staff-name">{member.name}</span>
@@ -531,7 +531,7 @@ export default async function AboutPage() {
               <p className="ab-empty">{'// 준비 중입니다'}</p>
             ) : (
               about.faq.map((item, idx) => (
-                <div key={item.q} className="faq-item">
+                <div key={item.q} className="faq-item vt-rise">
                   <details>
                     <summary className="faq-summary">
                       <div className="faq-summary-inner">

@@ -39,7 +39,7 @@ function IconSpinner() {
 // ─── Success Screen ───────────────────────────────────────────
 function SuccessScreen() {
   return (
-    <div className="af-success">
+    <div className="af-success rise">
       <style>{FORM_STYLES}</style>
       {/* 인쇄물풍 접수증 헤더 */}
       <div className="af-success-stamp">
@@ -437,7 +437,6 @@ const FORM_STYLES = `
   align-items: flex-start;
   gap: 0;
   padding: 0;
-  animation: af-slide-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .af-success-stamp {
   display: flex;

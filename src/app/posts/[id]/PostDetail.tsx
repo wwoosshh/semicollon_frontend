@@ -33,25 +33,15 @@ function DetailSkeleton() {
           background: var(--hairline);
           flex: 1;
         }
-        .det-load-label {
-          font-family: var(--font-mono);
-          font-size: 0.68rem;
-          letter-spacing: 0.1em;
-          color: var(--ink-faint);
-          animation: det-blink 1.2s step-end infinite;
-        }
-        @keyframes det-blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.2; }
-        }
       `}</style>
       <div style={{ display: 'flex', flexDirection: 'column', paddingTop: '2rem' }}>
-        {Array.from({ length: 8 }).map((_, i) => (
+        <div className="det-load-row">
+          <div className="det-load-bar" />
+          <div className="loading-line">{'// loading'}</div>
+        </div>
+        {Array.from({ length: 7 }).map((_, i) => (
           <div key={i} className="det-load-row">
             <div className="det-load-bar" />
-            {i === 0 && (
-              <span className="det-load-label">{'// loading...'}</span>
-            )}
           </div>
         ))}
       </div>
