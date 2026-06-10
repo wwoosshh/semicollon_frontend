@@ -243,7 +243,7 @@ function ApplicationRow({
           {/* Error */}
           {error && (
             <div className="ad-inline-error" role="alert">
-              <span className="ad-inline-error-icon">!</span>
+              <span className="ad-inline-error-tag">ERROR</span>
               {error}
             </div>
           )}
@@ -334,15 +334,19 @@ function ApplicationsTab({ token }: { token: string }) {
       {/* Content */}
       {loading ? (
         <div className="ad-loading" aria-label="불러오는 중">
-          <IconSpinner size={20} />
-          <span>불러오는 중…</span>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="ad-loading-row">
+              <div className="ad-loading-bar" />
+              {i === 0 && <span className="ad-loading-label">{'// loading...'}</span>}
+            </div>
+          ))}
         </div>
       ) : error ? (
         <div className="ad-error-box" role="alert">
-          <span className="ad-error-icon">!</span>
+          <span className="ad-error-tag">ERROR</span>
           <p>{error}</p>
           <button type="button" className="ad-retry-btn" onClick={loadApps}>
-            다시 시도
+            RETRY
           </button>
         </div>
       ) : apps.length === 0 ? (
@@ -353,7 +357,7 @@ function ApplicationsTab({ token }: { token: string }) {
           <p className="ad-empty-label">
             {filter === 'all' ? '아직 지원자가 없습니다.' : `${FILTER_LABELS[filter]} 상태의 지원자가 없습니다.`}
           </p>
-          <p className="ad-empty-hint">// no applications found</p>
+          <p className="ad-empty-hint">{'// no applications found'}</p>
         </div>
       ) : (
         <div className="ad-app-list" role="list" aria-label="지원자 목록">
@@ -452,15 +456,18 @@ function RecruitTab({ token }: { token: string }) {
 
   return (
     <div className="ad-tab-content">
-      {/* Current status card */}
+      {/* 현재 모집 상태 */}
       <div className="ad-info-card">
         <div className="ad-info-card-header">
           <span className="ad-info-card-label">현재 모집 상태</span>
         </div>
         {loadingInitial ? (
-          <div className="ad-loading" aria-label="불러오는 중">
-            <IconSpinner size={16} />
-            <span>불러오는 중…</span>
+          <div className="ad-loading">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="ad-loading-row">
+                <div className="ad-loading-bar" />
+              </div>
+            ))}
           </div>
         ) : recruit ? (
           <div className="ad-recruit-status">
@@ -661,22 +668,24 @@ function DashboardSkeleton() {
     <>
       <style>{STYLES}</style>
       <div className="ad-page" aria-label="로딩 중" aria-busy="true">
-        <div className="ad-grid" aria-hidden="true" />
         <div className="ad-container">
           <div className="ad-header">
-            <div className="ad-skel ad-skel-eyebrow" />
+            <p className="ad-eyebrow">{'// ADMIN — DASHBOARD'}</p>
             <div className="ad-skel ad-skel-title" />
           </div>
           <div className="ad-panel">
             <div className="ad-skel-tabs">
-              <div className="ad-skel ad-skel-tab" />
-              <div className="ad-skel ad-skel-tab" />
-              <div className="ad-skel ad-skel-tab" />
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="ad-skel ad-skel-tab" />
+              ))}
             </div>
             <div className="ad-skel-body">
-              <div className="ad-skel ad-skel-row" />
-              <div className="ad-skel ad-skel-row" />
-              <div className="ad-skel ad-skel-row" style={{ width: '75%' }} />
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="ad-loading-row">
+                  <div className="ad-loading-bar" />
+                  {i === 0 && <span className="ad-loading-label">{'// loading...'}</span>}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -713,15 +722,16 @@ export default function AdminDashboard() {
     <>
       <style>{STYLES}</style>
       <div className="ad-page">
-        <div className="ad-grid" aria-hidden="true" />
         <div className="ad-container">
-          {/* Page header */}
+          {/* 페이지 헤더 */}
           <div className="ad-header">
-            <span className="ad-eyebrow">Admin</span>
+            <p className="ad-eyebrow">{'// ADMIN — DASHBOARD'}</p>
             <h1 className="ad-title">관리자 대시보드</h1>
           </div>
 
-          {/* Panel */}
+          <hr className="ad-rule" />
+
+          {/* 패널 */}
           <div className="ad-panel">
             {/* Tab nav */}
             <nav className="ad-tabs" aria-label="관리 메뉴">
@@ -759,20 +769,18 @@ const STYLES = `
   to { transform: rotate(360deg); }
 }
 @keyframes ad-fade-up {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes ad-skel-pulse {
+@keyframes blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
+  50% { opacity: 0.2; }
 }
 
-/* ── Page shell ── */
+/* ── 페이지 셸 ── */
 .ad-page {
-  position: relative;
   min-height: calc(100dvh - 3.75rem);
   padding: 3rem 1.25rem 5rem;
-  overflow: hidden;
 }
 @media (min-width: 640px) {
   .ad-page { padding: 4rem 2rem 6rem; }
@@ -781,71 +789,54 @@ const STYLES = `
   .ad-page { padding: 5rem 2.5rem 7rem; }
 }
 
-.ad-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: radial-gradient(ellipse 80% 40% at 50% 0%, black 20%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 40% at 50% 0%, black 20%, transparent 100%);
-  pointer-events: none;
-}
-
 .ad-container {
-  position: relative;
   max-width: 960px;
   margin-inline: auto;
-  animation: ad-fade-up 0.35s ease both;
+  animation: ad-fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* ── Header ── */
+/* ── 헤더 ── */
 .ad-header {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
-  margin-bottom: 2.5rem;
+  gap: 0.75rem;
+  margin-bottom: 0;
 }
-
 .ad-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.75rem;
-  border-radius: 999px;
-  background: var(--accent-light);
-  color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  border: 1px solid var(--accent-muted);
-  align-self: flex-start;
-}
-
-.ad-title {
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  color: var(--foreground);
+  color: var(--vermilion);
   margin: 0;
 }
+.ad-title {
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+.ad-rule {
+  border: 0;
+  border-top: 1px solid var(--ink);
+  margin: 1.75rem 0 2rem;
+}
 
-/* ── Panel ── */
+/* ── 패널 — 직각 보더 상자 ── */
 .ad-panel {
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow);
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 2px;
   overflow: hidden;
 }
 
-/* ── Tabs ── */
+/* ── 탭 ── */
 .ad-tabs {
   display: flex;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  border-bottom: 1px solid var(--ink);
   overflow-x: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -857,38 +848,39 @@ const STYLES = `
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.375rem;
-  font-family: var(--font-sans);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--paper-deep);
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
   white-space: nowrap;
-  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+  transition: color 140ms ease, border-color 140ms ease, background 140ms ease;
   margin-bottom: -1px;
 }
 .ad-tab:hover {
-  color: var(--foreground);
-  background: var(--surface-alt);
+  color: var(--ink);
+  background: var(--paper);
 }
 .ad-tab-active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-  background: var(--background);
+  color: var(--ink);
+  border-bottom-color: var(--vermilion);
+  background: var(--paper);
 }
 .ad-tab-icon {
   display: flex;
   align-items: center;
-  opacity: 0.8;
+  opacity: 0.6;
 }
 .ad-tab-active .ad-tab-icon {
   opacity: 1;
-  color: var(--accent);
 }
 
-/* ── Tab content ── */
+/* ── 탭 콘텐츠 ── */
 .ad-tab-content {
   padding: 1.75rem;
   display: flex;
@@ -899,7 +891,7 @@ const STYLES = `
   .ad-tab-content { padding: 2rem 2.25rem; }
 }
 
-/* ── Filter bar ── */
+/* ── 필터 바 — 직각 태그 ── */
 .ad-filter-bar {
   display: flex;
   flex-wrap: wrap;
@@ -908,63 +900,64 @@ const STYLES = `
 .ad-filter-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.375rem 0.875rem;
-  border-radius: 999px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  background: var(--surface);
-  border: 1.5px solid var(--border);
+  padding: 0.3rem 0.75rem;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 1px solid var(--hairline);
   cursor: pointer;
-  transition: all 150ms ease;
-  font-family: var(--font-sans);
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
 }
 .ad-filter-btn:hover {
-  border-color: var(--text-subtle);
-  color: var(--foreground);
+  border-color: var(--ink);
+  color: var(--ink);
 }
 .ad-filter-btn-active {
-  background: var(--accent-light);
-  color: var(--accent);
-  border-color: var(--accent-muted);
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
 }
 
-/* ── App list ── */
+/* ── 지원자 목록 ── */
 .ad-app-list {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--hairline);
+  border-radius: 2px;
   overflow: hidden;
 }
-
 .ad-app-header {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr auto auto;
   gap: 1rem;
   padding: 0.625rem 1.25rem;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: var(--paper-deep);
+  border-bottom: 1px solid var(--hairline);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.6rem;
   font-weight: 600;
-  color: var(--text-subtle);
-  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 @media (max-width: 639px) {
   .ad-app-header { display: none; }
 }
 
-/* ── App row ── */
+/* ── 지원자 행 ── */
 .ad-app-row {
-  border-bottom: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--hairline);
 }
 .ad-app-row:last-child {
   border-bottom: none;
 }
 .ad-app-row-expanded {
-  background: var(--surface);
+  background: var(--paper-deep);
 }
 
 .ad-app-summary {
@@ -978,7 +971,7 @@ const STYLES = `
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: background 150ms ease;
+  transition: background 140ms ease;
   font-family: var(--font-sans);
 }
 @media (min-width: 640px) {
@@ -987,68 +980,80 @@ const STYLES = `
   }
 }
 .ad-app-summary:hover {
-  background: var(--surface);
+  background: var(--paper-deep);
 }
 .ad-app-row-expanded .ad-app-summary {
-  background: var(--surface-alt);
+  background: var(--paper-deep);
 }
 
 .ad-app-name {
+  font-family: var(--font-serif);
   font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--foreground);
+  color: var(--ink);
   letter-spacing: -0.01em;
 }
 .ad-app-contact {
-  font-size: 0.875rem;
-  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
 }
 .ad-app-date {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--text-subtle);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
 }
 @media (max-width: 639px) {
   .ad-app-contact { display: none; }
   .ad-app-date { display: none; }
 }
 .ad-app-chevron {
-  color: var(--text-subtle);
+  color: var(--ink-faint);
   display: flex;
   align-items: center;
 }
 
-/* ── Status Badge ── */
+/* ── 상태 배지 — 모노 대문자 직각 태그 ── */
 .ad-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.3125rem;
-  padding: 0.25rem 0.625rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
   font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   white-space: nowrap;
+  border: 1px solid;
 }
+/* pending: 잉크 페인트 */
 .ad-badge-pending {
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  background: var(--paper-deep);
+  color: var(--ink-soft);
+  border-color: var(--hairline);
 }
+/* accepted: 버밀리온 보더 + 글자 */
 .ad-badge-accepted {
-  background: var(--accent-light);
-  color: var(--accent);
-  border: 1px solid var(--accent-muted);
+  background: transparent;
+  color: var(--vermilion);
+  border-color: var(--vermilion);
 }
+/* rejected: 잉크 보더 + 흐림 */
 .ad-badge-rejected {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background: transparent;
+  color: var(--ink-faint);
+  border-color: var(--hairline);
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-faint);
 }
 
-/* ── App detail ── */
+/* ── 상세 ── */
 .ad-app-detail {
   padding: 1.25rem 1.5rem 1.5rem;
-  border-top: 1px solid var(--border-soft);
+  border-top: 1px solid var(--hairline);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -1063,226 +1068,240 @@ const STYLES = `
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
+  border-left: 2px solid var(--hairline);
+  padding-left: 1rem;
 }
 .ad-answer-q {
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
   font-weight: 600;
-  color: var(--foreground);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
   margin: 0;
-  letter-spacing: -0.01em;
 }
 .ad-answer-a {
   font-size: 0.9375rem;
-  color: var(--text-muted);
+  color: var(--ink-soft);
   margin: 0;
-  line-height: 1.7;
+  line-height: 1.75;
   white-space: pre-wrap;
 }
 .ad-no-answers {
-  font-size: 0.9rem;
-  color: var(--text-subtle);
   font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
   margin: 0;
 }
 
-/* Inline error */
+/* ── 인라인 에러 ── */
 .ad-inline-error {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 0.875rem;
-  border-radius: var(--radius);
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  font-size: 0.875rem;
-  color: #b91c1c;
-}
-.ad-inline-error-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.125rem;
-  height: 1.125rem;
-  border-radius: 50%;
-  background: #dc2626;
-  color: #fff;
-  font-size: 0.6rem;
-  font-weight: 800;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--vermilion);
+  background: var(--vermilion-tint);
   font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--vermilion-deep);
+}
+.ad-inline-error-tag {
   flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--vermilion);
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--vermilion);
+  line-height: 1.4;
 }
 
-/* ── Status action buttons ── */
+/* ── 상태 변경 버튼 ── */
 .ad-status-actions {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
-  padding-top: 0.25rem;
-  border-top: 1px solid var(--border-soft);
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--hairline);
 }
 .ad-status-actions-label {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
   margin-right: 0.25rem;
 }
 .ad-status-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.3125rem;
-  padding: 0.375rem 0.875rem;
-  border-radius: 999px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  border: 1.5px solid;
+  gap: 0.3rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid;
   cursor: pointer;
-  transition: all 150ms ease;
-  font-family: var(--font-sans);
+  transition: background 140ms ease, color 140ms ease;
 }
 .ad-status-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 .ad-status-btn-pending {
-  color: #475569;
-  background: #f8fafc;
-  border-color: #e2e8f0;
+  color: var(--ink-soft);
+  background: transparent;
+  border-color: var(--hairline);
 }
 .ad-status-btn-pending:not(:disabled):hover,
 .ad-status-btn-pending.ad-status-btn-active {
-  background: #f1f5f9;
-  border-color: #94a3b8;
-  color: #1e293b;
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
 }
 .ad-status-btn-accepted {
-  color: var(--accent);
-  background: var(--accent-light);
-  border-color: var(--accent-muted);
+  color: var(--vermilion);
+  background: transparent;
+  border-color: var(--vermilion);
 }
 .ad-status-btn-accepted:not(:disabled):hover,
 .ad-status-btn-accepted.ad-status-btn-active {
-  background: #e0e7ff;
-  border-color: var(--accent);
+  background: var(--vermilion);
+  color: var(--paper);
 }
 .ad-status-btn-rejected {
-  color: #b91c1c;
-  background: #fef2f2;
-  border-color: #fecaca;
+  color: var(--ink-faint);
+  background: transparent;
+  border-color: var(--hairline);
 }
 .ad-status-btn-rejected:not(:disabled):hover,
 .ad-status-btn-rejected.ad-status-btn-active {
-  background: #fee2e2;
-  border-color: #ef4444;
+  background: var(--ink-faint);
+  color: var(--paper);
+  border-color: var(--ink-faint);
 }
 
-/* ── Empty / Loading / Error states ── */
+/* ── 로딩 / 빈 상태 / 에러 ── */
 .ad-loading {
   display: flex;
+  flex-direction: column;
+  padding: 1.5rem 0;
+}
+.ad-loading-row {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.625rem;
-  padding: 3rem 1rem;
-  color: var(--text-subtle);
-  font-size: 0.9375rem;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.ad-loading-bar {
+  height: 1px;
+  background: var(--hairline);
+  flex: 1;
+}
+.ad-loading-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  animation: blink 1.2s step-end infinite;
 }
 
 .ad-error-box {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
-  padding: 2.5rem 1.5rem;
-  border: 1.5px dashed #fecaca;
-  border-radius: var(--radius-lg);
-  text-align: center;
+  padding: 1.5rem;
+  border: 1px solid var(--vermilion);
+  background: var(--vermilion-tint);
 }
-.ad-error-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background: #fee2e2;
-  color: #dc2626;
-  font-size: 1rem;
-  font-weight: 800;
+.ad-error-tag {
   font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--vermilion);
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--vermilion);
+  line-height: 1.4;
 }
 .ad-error-box > p {
-  font-size: 0.9375rem;
-  color: #b91c1c;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--vermilion-deep);
   margin: 0;
 }
 .ad-retry-btn {
-  padding: 0.5rem 1.125rem;
-  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.875rem;
   background: transparent;
-  color: var(--foreground);
-  border: 1.5px solid var(--border);
-  font-size: 0.875rem;
-  font-weight: 600;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
   cursor: pointer;
-  transition: all 150ms ease;
-  font-family: var(--font-sans);
+  transition: background 140ms ease, color 140ms ease;
 }
 .ad-retry-btn:hover {
-  background: var(--surface);
-  border-color: var(--text-subtle);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .ad-empty {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 4rem 1.5rem;
-  text-align: center;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 3rem 0.5rem;
 }
 .ad-empty-icon {
-  width: 4rem;
-  height: 4rem;
-  border-radius: 50%;
-  background: var(--surface-alt);
-  color: var(--text-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: var(--ink-faint);
   margin-bottom: 0.25rem;
 }
 .ad-empty-label {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--ink-soft);
   margin: 0;
 }
 .ad-empty-hint {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  color: var(--text-subtle);
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
   margin: 0;
 }
 
-/* ── Recruit status display ── */
+/* ── 모집 상태 카드 ── */
 .ad-info-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 2px;
   overflow: hidden;
 }
 .ad-info-card-header {
-  padding: 0.75rem 1.25rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-alt);
+  padding: 0.625rem 1.25rem;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--paper-deep);
 }
 .ad-info-card-label {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 600;
-  color: var(--text-subtle);
-  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 .ad-recruit-status {
@@ -1292,45 +1311,51 @@ const STYLES = `
   padding: 1rem 1.25rem;
   flex-wrap: wrap;
 }
+/* 모집 배지 — 직각 태그 */
 .ad-recruit-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.3rem 0.875rem;
-  border-radius: 999px;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--ink-faint);
+  border: 1px solid var(--hairline);
 }
 .ad-recruit-badge-active {
-  background: var(--accent-light);
-  color: var(--accent);
-  border-color: var(--accent-muted);
+  color: var(--vermilion);
+  border-color: var(--vermilion);
 }
 .ad-recruit-dates {
   display: flex;
   align-items: center;
   gap: 0.625rem;
   flex-wrap: wrap;
-  font-size: 0.875rem;
-  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
 }
 .ad-recruit-dates strong {
-  color: var(--foreground);
+  color: var(--ink);
   font-weight: 600;
 }
 .ad-dot {
-  color: var(--text-subtle);
+  color: var(--ink-faint);
 }
 .ad-no-data {
   padding: 1rem 1.25rem;
-  font-size: 0.875rem;
-  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
   margin: 0;
+  letter-spacing: 0.04em;
 }
 
-/* ── Settings form ── */
+/* ── 설정 폼 ── */
 .ad-settings-form {
   display: flex;
   flex-direction: column;
@@ -1350,111 +1375,103 @@ const STYLES = `
   gap: 0.4375rem;
 }
 .ad-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--foreground);
-  letter-spacing: -0.01em;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  cursor: pointer;
 }
 .ad-required {
-  color: var(--accent);
+  color: var(--vermilion);
 }
 .ad-field-hint {
-  font-size: 0.8rem;
-  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
   margin: 0;
 }
 .ad-input {
   width: 100%;
-  padding: 0.6875rem 1rem;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--background);
-  color: var(--foreground);
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
   outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color 120ms ease;
   -webkit-appearance: none;
   appearance: none;
 }
 .ad-input::placeholder {
-  color: var(--text-subtle);
+  color: var(--ink-faint);
 }
 .ad-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-light);
+  border-color: var(--ink);
+  border-width: 2px;
 }
 .ad-input:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 .ad-input-mono {
   font-family: var(--font-mono);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 .ad-input-error {
-  border-color: #f87171;
+  border-color: var(--vermilion);
 }
 .ad-input-error:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px #fee2e2;
+  border-color: var(--vermilion);
+  border-width: 2px;
 }
 .ad-field-error {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #dc2626;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-.ad-field-error::before {
-  content: '!';
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  background: #fee2e2;
-  color: #dc2626;
-  font-size: 0.65rem;
-  font-weight: 800;
   font-family: var(--font-mono);
-  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--vermilion);
+  margin: 0;
 }
 
-/* ── Feedback ── */
+/* ── 피드백 ── */
 .ad-feedback {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  border-radius: var(--radius);
-  font-size: 0.875rem;
-  font-weight: 600;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   align-self: flex-start;
 }
 .ad-feedback-ok {
-  background: #f0fdf4;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--ink);
 }
 .ad-feedback-err {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background: var(--vermilion-tint);
+  color: var(--vermilion-deep);
+  border-color: var(--vermilion);
 }
 
-/* ── Form actions ── */
+/* ── 폼 액션 ── */
 .ad-form-actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--border-soft);
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--hairline);
 }
 
 .ad-btn-primary {
@@ -1462,27 +1479,26 @@ const STYLES = `
   align-items: center;
   justify-content: center;
   gap: 0.4375rem;
-  padding: 0.6875rem 1.625rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--font-sans);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border: none;
+  padding: 0.875rem 1.625rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
   cursor: pointer;
-  transition: background 150ms ease, box-shadow 150ms ease, transform 100ms ease;
-  box-shadow: 0 2px 8px rgb(79 70 229 / 0.25);
+  transition: background 160ms ease, border-color 160ms ease;
 }
 .ad-btn-primary:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 4px 14px rgb(79 70 229 / 0.35);
+  background: var(--vermilion);
+  border-color: var(--vermilion);
 }
-.ad-btn-primary:active { transform: translateY(1px); }
 .ad-btn-primary:disabled {
-  opacity: 0.65;
+  opacity: 0.55;
   cursor: not-allowed;
-  transform: none;
 }
 
 .ad-btn-danger {
@@ -1490,90 +1506,79 @@ const STYLES = `
   align-items: center;
   justify-content: center;
   gap: 0.4375rem;
-  padding: 0.6875rem 1.375rem;
-  border-radius: 999px;
+  padding: 0.875rem 1.375rem;
   background: transparent;
-  color: #b91c1c;
-  font-family: var(--font-sans);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border: 1.5px solid #fecaca;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background 160ms ease, color 160ms ease;
 }
 .ad-btn-danger:hover {
-  background: #fef2f2;
-  border-color: #ef4444;
+  background: var(--ink);
+  color: var(--paper);
 }
-.ad-btn-danger:active { transform: translateY(1px); }
 .ad-btn-danger:disabled {
-  opacity: 0.55;
+  opacity: 0.45;
   cursor: not-allowed;
-  transform: none;
 }
 
-/* ── Notice box ── */
+/* ── 공지 박스 ── */
 .ad-notice {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  padding: 0.875rem 1.125rem;
-  border-radius: var(--radius);
-  background: var(--accent-light);
-  border: 1px solid var(--accent-muted);
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--hairline);
+  background: var(--paper-deep);
+  border-left: 2px solid var(--ink-soft);
 }
 .ad-notice-icon {
-  color: var(--accent);
+  color: var(--ink-soft);
   display: flex;
   align-items: center;
   margin-top: 0.0625rem;
   flex-shrink: 0;
 }
 .ad-notice-text {
-  font-size: 0.9rem;
-  color: #3730a3;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
   margin: 0;
   line-height: 1.65;
+  letter-spacing: 0.02em;
 }
 
-/* ── Skeleton ── */
+/* ── 스켈레톤 ── */
 .ad-skel {
-  border-radius: var(--radius);
-  background: var(--surface-alt);
-  animation: ad-skel-pulse 1.5s ease-in-out infinite;
-}
-.ad-skel-eyebrow {
-  height: 1.5rem;
-  width: 4rem;
-  border-radius: 999px;
-  margin-bottom: 0.5rem;
+  background: var(--hairline-soft);
+  animation: blink 1.5s ease-in-out infinite;
 }
 .ad-skel-title {
   height: 2.5rem;
   width: 14rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 0;
 }
 .ad-skel-tabs {
   display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
-  padding: 0.875rem 1.375rem;
-  background: var(--surface);
   gap: 0.75rem;
+  border-bottom: 1px solid var(--ink);
+  padding: 0.875rem 1.375rem;
+  background: var(--paper-deep);
 }
 .ad-skel-tab {
-  height: 1.25rem;
+  height: 1rem;
   width: 5rem;
 }
 .ad-skel-body {
   padding: 2rem 2.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-.ad-skel-row {
-  height: 3rem;
-  width: 100%;
-  border-radius: var(--radius);
+  gap: 0;
 }
 `;

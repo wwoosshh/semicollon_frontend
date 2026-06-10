@@ -55,7 +55,7 @@ function IconSpinner() {
 
 function IconImage() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="3" y="3" width="18" height="18" rx="2" />
       <circle cx="8.5" cy="8.5" r="1.5" />
       <path d="M21 15l-5-5L5 21" />
@@ -212,7 +212,14 @@ export default function PostEditor() {
       <>
         <style>{STYLES}</style>
         <div className="pe-loading" aria-label="로딩 중">
-          <IconSpinner />
+          <div className="pe-loading-inner">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="pe-loading-row">
+                <div className="pe-loading-bar" />
+                {i === 0 && <span className="pe-loading-label">{'// loading...'}</span>}
+              </div>
+            ))}
+          </div>
         </div>
       </>
     );
@@ -224,27 +231,32 @@ export default function PostEditor() {
     <>
       <style>{STYLES}</style>
       <div className="pe-page">
-        <div className="pe-grid" aria-hidden="true" />
         <div className="pe-container">
-          {/* Page header */}
+
+          {/* ── 페이지 헤더 ────────────────────────────────── */}
           <div className="pe-header">
-            <span className="pe-eyebrow">Write</span>
+            <p className="pe-eyebrow">{'// POSTS — NEW ENTRY'}</p>
             <h1 className="pe-title">새 글 작성</h1>
           </div>
 
+          <hr className="pe-rule" />
+
           <form className="pe-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-            {/* Server error */}
+
+            {/* 서버 에러 */}
             {serverError && (
               <div className="pe-server-error" role="alert">
-                <span className="pe-server-error-icon" aria-hidden="true">!</span>
+                <span className="pe-server-error-tag">ERROR</span>
                 <p className="pe-server-error-text">{serverError}</p>
               </div>
             )}
 
-            {/* Title */}
+            {/* 01 제목 */}
             <div className="pe-field">
               <label className="pe-label" htmlFor="pe-title">
-                제목 <span className="pe-required" aria-hidden="true">*</span>
+                <span className="pe-field-no">01</span>
+                제목
+                <span className="pe-required" aria-hidden="true"> *</span>
               </label>
               <input
                 id="pe-title"
@@ -262,12 +274,13 @@ export default function PostEditor() {
               )}
             </div>
 
-            {/* Meta row: category + visibility */}
-            <div className="pe-meta-row">
-              {/* Category */}
-              <div className="pe-field">
+            {/* 02 카테고리 + 공개 범위 */}
+            <div className="pe-field pe-field-meta">
+              <div className="pe-field pe-field-inline">
                 <label className="pe-label" htmlFor="pe-category">
-                  카테고리 <span className="pe-required" aria-hidden="true">*</span>
+                  <span className="pe-field-no">02</span>
+                  카테고리
+                  <span className="pe-required" aria-hidden="true"> *</span>
                 </label>
                 <select
                   id="pe-category"
@@ -283,10 +296,11 @@ export default function PostEditor() {
                 )}
               </div>
 
-              {/* Visibility */}
-              <div className="pe-field">
+              <div className="pe-field pe-field-inline">
                 <label className="pe-label" htmlFor="pe-visibility">
-                  공개 범위 <span className="pe-required" aria-hidden="true">*</span>
+                  <span className="pe-field-no">03</span>
+                  공개 범위
+                  <span className="pe-required" aria-hidden="true"> *</span>
                 </label>
                 <select
                   id="pe-visibility"
@@ -303,10 +317,12 @@ export default function PostEditor() {
               </div>
             </div>
 
-            {/* Content */}
-            <div className="pe-field pe-field-content">
+            {/* 04 본문 */}
+            <div className="pe-field">
               <label className="pe-label" htmlFor="pe-content">
-                본문 <span className="pe-required" aria-hidden="true">*</span>
+                <span className="pe-field-no">04</span>
+                본문
+                <span className="pe-required" aria-hidden="true"> *</span>
               </label>
               <textarea
                 id="pe-content"
@@ -324,11 +340,12 @@ export default function PostEditor() {
               )}
             </div>
 
-            {/* Image attachments */}
+            {/* 05 이미지 첨부 */}
             <div className="pe-field">
-              <div className="pe-images-header">
-                <span className="pe-label">이미지 첨부</span>
-                <span className="pe-label-hint">여러 장 선택 가능</span>
+              <div className="pe-label pe-images-label">
+                <span className="pe-field-no">05</span>
+                이미지 첨부
+                <span className="pe-optional"> (선택)</span>
               </div>
 
               {/* Thumbnails */}
@@ -395,30 +412,35 @@ export default function PostEditor() {
               )}
             </div>
 
-            {/* Actions */}
+            {/* 액션 */}
             <div className="pe-actions">
-              <button
-                type="button"
-                className="btn btn-ghost pe-cancel-btn"
-                onClick={() => router.back()}
-              >
-                취소
-              </button>
-              <button
-                type="submit"
-                className="pe-submit-btn"
-                disabled={isSubmitting}
-                aria-busy={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <IconSpinner />
-                    등록 중…
-                  </>
-                ) : (
-                  '글 등록'
-                )}
-              </button>
+              <p className="pe-footer-note">
+                <span className="pe-required">*</span> 표시 항목은 필수입니다.
+              </p>
+              <div className="pe-actions-btns">
+                <button
+                  type="button"
+                  className="btn btn-ghost pe-cancel-btn"
+                  onClick={() => router.back()}
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary pe-submit-btn"
+                  disabled={isSubmitting}
+                  aria-busy={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <IconSpinner />
+                      등록 중…
+                    </>
+                  ) : (
+                    '글 등록'
+                  )}
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -433,23 +455,50 @@ const STYLES = `
   to { transform: rotate(360deg); }
 }
 @keyframes pe-fade-up {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-.pe-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100dvh - 3.75rem);
-  color: var(--text-subtle);
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
 }
 
+/* ── 로딩 ── */
+.pe-loading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: calc(100dvh - 3.75rem);
+  padding: 4rem 1.25rem;
+}
+.pe-loading-inner {
+  width: 100%;
+  max-width: 760px;
+}
+.pe-loading-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.pe-loading-bar {
+  height: 1px;
+  background: var(--hairline);
+  flex: 1;
+}
+.pe-loading-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  animation: blink 1.2s step-end infinite;
+}
+
+/* ── 페이지 셸 ── */
 .pe-page {
-  position: relative;
   min-height: calc(100dvh - 3.75rem);
   padding: 3rem 1.25rem 5rem;
-  overflow: hidden;
 }
 @media (min-width: 640px) {
   .pe-page { padding: 4rem 2rem 6rem; }
@@ -458,237 +507,227 @@ const STYLES = `
   .pe-page { padding: 5rem 2.5rem 7rem; }
 }
 
-.pe-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: radial-gradient(ellipse 80% 40% at 50% 0%, black 20%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 40% at 50% 0%, black 20%, transparent 100%);
-  pointer-events: none;
-}
-
 .pe-container {
-  position: relative;
   max-width: 760px;
   margin-inline: auto;
-  animation: pe-fade-up 0.35s ease both;
+  animation: pe-fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* ── 헤더 ── */
 .pe-header {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
-  margin-bottom: 2.5rem;
+  gap: 0.75rem;
+  margin-bottom: 0;
 }
-
 .pe-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.75rem;
-  border-radius: 999px;
-  background: var(--accent-light);
-  color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  border: 1px solid var(--accent-muted);
-  align-self: flex-start;
-}
-
-.pe-title {
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  color: var(--foreground);
+  color: var(--vermilion);
   margin: 0;
 }
+.pe-title {
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+.pe-rule {
+  border: 0;
+  border-top: 1px solid var(--ink);
+  margin: 1.75rem 0 0;
+}
 
-/* Form */
+/* ── 폼 ── */
 .pe-form {
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow);
-  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-}
-@media (min-width: 640px) {
-  .pe-form { padding: 2.5rem; }
+  gap: 0;
 }
 
-/* Server error */
+/* ── 서버 에러 ── */
 .pe-server-error {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 1rem;
   padding: 0.875rem 1rem;
-  border-radius: var(--radius);
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
+  border: 1px solid var(--vermilion);
+  background: var(--vermilion-tint);
+  margin-top: 1.75rem;
 }
-.pe-server-error-icon {
+.pe-server-error-tag {
   flex-shrink: 0;
-  width: 1.375rem;
-  height: 1.375rem;
-  border-radius: 50%;
-  background: #ea580c;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.6875rem;
-  font-weight: 800;
   font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vermilion);
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--vermilion);
+  line-height: 1.4;
+  margin-top: 0.1rem;
 }
 .pe-server-error-text {
-  font-size: 0.9rem;
-  color: #9a3412;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--vermilion-deep);
   margin: 0;
   line-height: 1.6;
 }
 
-/* Fields */
+/* ── 필드 — 괘선 구획 ── */
 .pe-field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0;
+  border-bottom: 1px solid var(--hairline);
+  padding: 1.5rem 0 1.25rem;
 }
-.pe-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--foreground);
-  letter-spacing: -0.01em;
-}
-.pe-label-hint {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: var(--text-subtle);
-  margin-left: 0.375rem;
-}
-.pe-required {
-  color: var(--accent);
+.pe-field:first-of-type {
+  border-top: 1px solid var(--hairline);
+  margin-top: 1.75rem;
 }
 
-.pe-meta-row {
+/* 메타(카테고리+공개범위) 행 — 필드를 가로로 */
+.pe-field-meta {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 2rem;
+  border-bottom: 1px solid var(--hairline);
+  border-top: none;
+  padding: 1.5rem 0 1.25rem;
+  margin-top: 0;
 }
 @media (max-width: 479px) {
-  .pe-meta-row { grid-template-columns: 1fr; }
+  .pe-field-meta { grid-template-columns: 1fr; }
+}
+.pe-field-inline {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.pe-field-inline:first-of-type {
+  border-top: none;
+  margin-top: 0;
 }
 
-.pe-images-header {
+/* ── 라벨 — 모노 대문자 ── */
+.pe-label {
   display: flex;
-  align-items: center;
-  gap: 0;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+.pe-images-label {
+  cursor: default;
+}
+.pe-field-no {
+  color: var(--vermilion);
+  font-weight: 600;
+}
+.pe-required {
+  color: var(--vermilion);
+}
+.pe-optional {
+  font-weight: 400;
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
 }
 
-/* Input / Textarea / Select */
+/* ── 인풋 / 텍스트에어리어 / 셀렉트 ── */
 .pe-input,
 .pe-textarea,
 .pe-select {
   width: 100%;
-  padding: 0.6875rem 1rem;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--background);
-  color: var(--foreground);
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 0.9375rem;
+  line-height: 1.65;
   outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color 120ms ease;
   -webkit-appearance: none;
   appearance: none;
 }
 .pe-input::placeholder,
 .pe-textarea::placeholder {
-  color: var(--text-subtle);
+  color: var(--ink-faint);
+  font-size: 0.875rem;
 }
 .pe-input:focus,
 .pe-textarea:focus,
 .pe-select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-light);
+  border-color: var(--ink);
+  border-width: 2px;
 }
 .pe-input-error {
-  border-color: #f87171;
+  border-color: var(--vermilion);
+  border-width: 1px;
 }
 .pe-input-error:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px #fee2e2;
+  border-color: var(--vermilion);
+  border-width: 2px;
 }
-
 .pe-title-input {
-  font-size: 1.0625rem;
+  font-size: 1.125rem;
   font-weight: 600;
 }
-
 .pe-textarea {
   resize: vertical;
   min-height: 240px;
   line-height: 1.75;
 }
-
 .pe-select {
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%231c1a15' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.875rem center;
-  padding-right: 2.5rem;
+  background-position: right 0.75rem center;
+  padding-right: 2.25rem;
 }
 
-/* Error message */
+/* ── 에러 메시지 ── */
 .pe-error {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #dc2626;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-.pe-error::before {
-  content: '!';
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  background: #fee2e2;
-  color: #dc2626;
-  font-size: 0.65rem;
-  font-weight: 800;
   font-family: var(--font-mono);
-  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--vermilion);
+  margin: 0.5rem 0 0;
 }
 
-/* Image thumbnails */
+/* ── 이미지 썸네일 ── */
 .pe-thumbs {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
 }
-
 .pe-thumb {
   position: relative;
   width: 5rem;
   height: 5rem;
-  border-radius: var(--radius);
   overflow: hidden;
-  border: 1.5px solid var(--border);
-  background: var(--surface-alt);
+  border: 1px solid var(--hairline);
+  background: var(--paper-deep);
   flex-shrink: 0;
+  border-radius: 2px;
 }
 .pe-thumb-img {
   width: 100%;
@@ -705,19 +744,18 @@ const STYLES = `
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.6);
-  color: var(--accent);
+  background: rgba(246, 244, 238, 0.7);
+  color: var(--ink-soft);
 }
 .pe-thumb-error {
-  border-color: #fca5a5;
+  border-color: var(--vermilion);
 }
 .pe-thumb-error-overlay {
   position: absolute;
   bottom: 0.25rem;
   left: 0.25rem;
-  color: #dc2626;
-  background: rgba(255,255,255,0.85);
-  border-radius: 50%;
+  color: var(--vermilion);
+  background: rgba(246, 244, 238, 0.9);
   width: 1.25rem;
   height: 1.25rem;
   display: flex;
@@ -730,9 +768,8 @@ const STYLES = `
   right: 0.25rem;
   width: 1.25rem;
   height: 1.25rem;
-  border-radius: 50%;
-  background: rgba(15, 23, 42, 0.7);
-  color: #fff;
+  background: var(--ink);
+  color: var(--paper);
   border: none;
   cursor: pointer;
   display: flex;
@@ -741,30 +778,31 @@ const STYLES = `
   transition: background 150ms ease;
 }
 .pe-thumb-remove:hover {
-  background: rgba(15, 23, 42, 0.9);
+  background: var(--vermilion);
 }
 
-/* Upload button */
+/* ── 업로드 버튼 ── */
 .pe-upload-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5625rem 1.125rem;
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--text-muted);
-  border: 1.5px solid var(--border);
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+  transition: background 140ms ease, color 140ms ease;
+  border-radius: 2px;
   align-self: flex-start;
 }
 .pe-upload-btn:hover {
-  background: var(--surface-alt);
-  border-color: var(--text-subtle);
-  color: var(--foreground);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .pe-file-input {
@@ -776,56 +814,42 @@ const STYLES = `
 }
 
 .pe-upload-error-note {
-  font-size: 0.8rem;
-  color: #dc2626;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--vermilion);
+  margin: 0.5rem 0 0;
+  letter-spacing: 0.04em;
 }
 
-/* Actions */
+/* ── 액션 ── */
 .pe-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--border-soft);
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 2rem 0 0;
 }
-
-.pe-cancel-btn {
-  padding: 0.6875rem 1.375rem;
-  font-size: 0.9375rem;
-}
-
-.pe-submit-btn {
-  display: inline-flex;
+.pe-actions-btns {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.6875rem 1.75rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--font-sans);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: background 150ms ease, box-shadow 150ms ease, transform 100ms ease;
-  box-shadow: 0 2px 8px rgb(79 70 229 / 0.25);
+  gap: 0.75rem;
 }
-.pe-submit-btn:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 4px 14px rgb(79 70 229 / 0.35);
+.pe-footer-note {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin: 0;
 }
-.pe-submit-btn:active {
-  transform: translateY(1px);
+.pe-cancel-btn {
+  padding: 0.875rem 1.375rem;
+}
+.pe-submit-btn {
+  min-width: 8rem;
 }
 .pe-submit-btn:disabled {
-  opacity: 0.65;
+  opacity: 0.55;
   cursor: not-allowed;
-  transform: none;
 }
 `;
