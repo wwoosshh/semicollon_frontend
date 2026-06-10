@@ -41,571 +41,499 @@ const FAQ = [
   },
 ];
 
-// ─── SVG Icons ────────────────────────────────────────────────
-function IconVision() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 8v4l3 3" />
-    </svg>
-  );
-}
-
-function IconCode() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polyline points="16 18 22 12 16 6" />
-      <polyline points="8 6 2 12 8 18" />
-    </svg>
-  );
-}
-
-function IconPeople() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
-function IconEvent() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  );
-}
+const VISION = [
+  { no: '01', en: 'LEARN TOGETHER', ko: '함께 배우기', body: '혼자보다 같이할 때 더 빠릅니다. 주제별 스터디로 꾸준히 학습합니다.' },
+  { no: '02', en: 'BUILD THINGS',   ko: '직접 만들기',  body: '아이디어를 제품으로. 팀 프로젝트를 통해 기획부터 배포까지 경험합니다.' },
+  { no: '03', en: 'CONNECT PEOPLE', ko: '네트워크 넓히기', body: '다양한 배경의 사람들과 연결되어 시야를 넓히고 함께 성장합니다.' },
+  { no: '04', en: 'SHARE OUTPUT',   ko: '세상에 공유하기', body: '세미나·해커톤으로 결과물을 공유하고 외부와 연결됩니다.' },
+];
 
 // ─── Page ─────────────────────────────────────────────────────
 export default function AboutPage() {
   return (
     <>
       <style>{`
-        /* ── Page Hero ── */
-        .about-hero {
-          position: relative;
-          overflow: hidden;
-          padding: 5rem 1.25rem 4rem;
+        /* ── 페이지 헤더 ── */
+        .ab-hero {
+          border-bottom: 1px solid var(--ink);
         }
-        @media (min-width: 640px) {
-          .about-hero { padding: 6rem 2rem 5rem; }
+        .ab-hero-inner {
+          display: grid;
+          grid-template-columns: 1fr;
+          min-height: 44vh;
         }
-        @media (min-width: 1024px) {
-          .about-hero { padding: 7rem 2.5rem 6rem; }
+        @media (min-width: 900px) {
+          .ab-hero-inner {
+            grid-template-columns: 1fr 220px;
+          }
         }
-        .about-hero-grid {
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(var(--border-soft) 1px, transparent 1px),
-            linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
-          background-size: 40px 40px;
-          mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
-          -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
-          pointer-events: none;
+        .ab-hero-main {
+          padding: 4rem 0 3.5rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          border-bottom: 1px solid var(--hairline);
         }
-        .about-hero-inner {
-          position: relative;
-          max-width: 680px;
+        @media (min-width: 900px) {
+          .ab-hero-main {
+            border-bottom: none;
+            border-right: 1px solid var(--hairline);
+            padding-right: 3rem;
+          }
         }
-        .page-eyebrow {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.375rem;
-          padding: 0.3rem 0.875rem;
-          border-radius: 999px;
-          background: var(--accent-light);
-          color: var(--accent);
+        .ab-eyebrow {
           font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-size: 0.78rem;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
+          color: var(--vermilion);
           margin-bottom: 1.5rem;
-          border: 1px solid var(--accent-muted);
         }
-        .about-hero-h1 {
-          font-size: clamp(2rem, 5vw, 3.25rem);
-          font-weight: 800;
-          letter-spacing: -0.035em;
-          line-height: 1.15;
-          color: var(--foreground);
-          margin: 0 0 1.25rem;
+        .ab-h1 {
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: clamp(2.25rem, 6vw, 4rem);
+          line-height: 1.18;
+          letter-spacing: -0.02em;
+          color: var(--ink);
+          margin: 0 0 1.5rem;
         }
-        .about-hero-sub {
+        .ab-lead {
+          max-width: 36rem;
           font-size: 1.0625rem;
-          color: var(--text-muted);
-          line-height: 1.8;
+          line-height: 1.85;
+          color: var(--ink-soft);
           margin: 0;
-          max-width: 520px;
         }
-
-        /* ── Section commons ── */
-        .about-section {
-          padding: 5rem 1.25rem;
+        /* 우측 판권면 칼럼 */
+        .ab-meta {
+          display: flex;
+          flex-direction: column;
         }
-        @media (min-width: 640px) {
-          .about-section { padding: 5rem 2rem; }
+        @media (min-width: 900px) {
+          .ab-meta {
+            padding-left: 2rem;
+            padding-top: 4rem;
+          }
         }
-        @media (min-width: 1024px) {
-          .about-section { padding: 6rem 2.5rem; }
+        .ab-meta-row {
+          padding: 0.9rem 0;
+          border-bottom: 1px solid var(--hairline-soft);
         }
-        .about-section-alt {
-          background: var(--surface);
-          border-top: 1px solid var(--border);
-          border-bottom: 1px solid var(--border);
-        }
-        .section-label {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
+        .ab-meta-row:last-child { border-bottom: none; }
+        .ab-meta-k {
           font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: var(--accent);
-          letter-spacing: 0.1em;
+          font-size: 0.62rem;
+          letter-spacing: 0.18em;
           text-transform: uppercase;
-          margin-bottom: 0.875rem;
-        }
-        .section-label::before {
-          content: '';
+          color: var(--ink-faint);
           display: block;
-          width: 1.5rem;
-          height: 1.5px;
-          background: var(--accent);
-          border-radius: 1px;
+          margin-bottom: 0.2rem;
         }
-        .section-h2 {
-          font-size: clamp(1.5rem, 3.5vw, 2.25rem);
-          font-weight: 750;
-          letter-spacing: -0.03em;
-          color: var(--foreground);
-          margin: 0 0 0.75rem;
-        }
-        .section-desc {
-          font-size: 1rem;
-          color: var(--text-muted);
-          margin: 0 0 3rem;
-          max-width: 480px;
-          line-height: 1.75;
+        .ab-meta-v {
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          color: var(--ink);
         }
 
-        /* ── Vision Cards ── */
+        /* ── 섹션 공통 ── */
+        .ab-sec {
+          border-bottom: 1px solid var(--ink);
+        }
+        .ab-sec-head {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 1rem;
+          padding: 1.1rem 0;
+          border-bottom: 1px solid var(--hairline);
+        }
+        .ab-sec-body {
+          padding: 3rem 0 4rem;
+        }
+
+        /* ── 01 비전 ── */
         .vision-grid {
           display: grid;
-          gap: 1.25rem;
           grid-template-columns: 1fr;
-          margin-top: 3rem;
         }
         @media (min-width: 640px) {
           .vision-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        @media (min-width: 900px) {
+        @media (min-width: 1024px) {
           .vision-grid { grid-template-columns: repeat(4, 1fr); }
         }
-        .vision-card {
-          background: var(--background);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 1.75rem 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
-        }
-        .vision-card:hover {
-          box-shadow: var(--shadow);
-          transform: translateY(-2px);
-          border-color: var(--accent-muted);
-        }
-        .vision-icon {
-          width: 2.5rem;
-          height: 2.5rem;
-          border-radius: var(--radius);
-          background: var(--accent-light);
-          color: var(--accent);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-        .vision-card-title {
-          font-size: 1rem;
-          font-weight: 700;
-          letter-spacing: -0.02em;
-          color: var(--foreground);
-          margin: 0 0 0.25rem;
-          line-height: 1.35;
-        }
-        .vision-card-desc {
-          font-size: 0.9rem;
-          color: var(--text-muted);
-          line-height: 1.7;
-          margin: 0;
-        }
-
-        /* ── Timeline ── */
-        .timeline {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          gap: 0;
-        }
-        .timeline-year-block {
-          display: grid;
-          grid-template-columns: 6rem 1px 1fr;
-          gap: 0 2rem;
-          align-items: stretch;
+        .vision-col {
+          padding: 2rem 0;
+          border-bottom: 1px solid var(--hairline-soft);
+          transition: background 160ms ease;
         }
         @media (min-width: 640px) {
-          .timeline-year-block {
-            grid-template-columns: 7rem 1px 1fr;
-            gap: 0 2.5rem;
+          .vision-col {
+            border-bottom: none;
+            border-right: 1px solid var(--hairline);
+            padding: 2rem 2rem 2rem 0;
+          }
+          .vision-col:nth-child(2) { padding-left: 2rem; }
+          .vision-col:nth-child(4) {
+            border-right: none;
+            padding-left: 2rem;
           }
         }
-        .timeline-year {
+        @media (min-width: 1024px) {
+          .vision-col {
+            padding: 2.25rem 2.25rem 2.25rem 0;
+          }
+          .vision-col:not(:first-child) { padding-left: 2.25rem; }
+          .vision-col:last-child { border-right: none; }
+        }
+        .vision-no {
           font-family: var(--font-mono);
-          font-size: 0.9375rem;
-          font-weight: 700;
-          color: var(--accent);
-          padding-top: 0.125rem;
-          letter-spacing: -0.02em;
-          text-align: right;
-          padding-right: 0;
+          font-size: 0.68rem;
+          letter-spacing: 0.14em;
+          color: var(--vermilion);
+          margin-bottom: 1.1rem;
         }
-        .timeline-line {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0;
-          position: relative;
-        }
-        .timeline-dot {
-          width: 0.625rem;
-          height: 0.625rem;
-          border-radius: 50%;
-          background: var(--accent);
-          flex-shrink: 0;
-          margin-top: 0.2rem;
-          box-shadow: 0 0 0 3px var(--accent-light);
-        }
-        .timeline-connector {
-          flex: 1;
-          width: 1px;
-          background: var(--border);
-          min-height: 1rem;
-        }
-        .timeline-year-block:last-child .timeline-connector {
-          display: none;
-        }
-        .timeline-items {
-          padding-bottom: 2rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-          padding-left: 0;
-        }
-        .timeline-item {
-          font-size: 0.9375rem;
-          color: var(--text-muted);
-          line-height: 1.6;
-          padding: 0.5rem 0.875rem;
-          background: var(--background);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-sm);
-          width: fit-content;
-          max-width: 100%;
-          transition: border-color 150ms ease, color 150ms ease;
-        }
-        .timeline-item:first-child {
-          margin-top: 0;
-        }
-        .timeline-item:hover {
-          border-color: var(--accent-muted);
-          color: var(--foreground);
-        }
-
-        /* ── Staff ── */
-        .staff-grid {
-          display: grid;
-          gap: 1.25rem;
-          grid-template-columns: 1fr;
-        }
-        @media (min-width: 560px) {
-          .staff-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (min-width: 860px) {
-          .staff-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-        .staff-card {
-          background: var(--background);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 2rem 1.75rem;
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-          align-items: flex-start;
-          transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
-        }
-        .staff-card:hover {
-          box-shadow: var(--shadow);
-          transform: translateY(-2px);
-          border-color: var(--accent-muted);
-        }
-        .staff-avatar {
-          width: 3.25rem;
-          height: 3.25rem;
-          border-radius: 50%;
-          background: var(--accent-light);
-          border: 2px solid var(--accent-muted);
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .vision-en {
           font-family: var(--font-mono);
-          font-size: 1.0625rem;
-          font-weight: 700;
-          color: var(--accent);
-          letter-spacing: -0.02em;
-          flex-shrink: 0;
+          font-size: 0.62rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
+          margin-bottom: 0.3rem;
         }
-        .staff-info { display: flex; flex-direction: column; gap: 0.25rem; }
-        .staff-name {
-          font-size: 1.0625rem;
+        .vision-ko {
+          font-family: var(--font-serif);
           font-weight: 700;
-          letter-spacing: -0.02em;
-          color: var(--foreground);
+          font-size: 1.3rem;
+          color: var(--ink);
+          margin: 0 0 0.875rem;
+        }
+        .vision-body {
+          font-size: 0.9rem;
+          line-height: 1.85;
+          color: var(--ink-soft);
           margin: 0;
         }
-        .staff-role {
-          display: inline-flex;
-          align-items: center;
-          padding: 0.1875rem 0.5rem;
-          border-radius: 999px;
-          background: var(--accent-light);
-          color: var(--accent);
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.02em;
-          width: fit-content;
+
+        /* ── 02 연혁: 색인 테이블 ── */
+        .history-table {
+          width: 100%;
+          border-collapse: collapse;
         }
+        .history-year-row td {
+          padding: 1.75rem 0 0.5rem;
+          vertical-align: top;
+        }
+        .history-year-row:first-child td {
+          padding-top: 0.5rem;
+        }
+        .history-year {
+          font-family: var(--font-mono);
+          font-weight: 600;
+          font-size: 0.92rem;
+          color: var(--vermilion);
+          letter-spacing: 0.06em;
+          width: 5rem;
+          padding-right: 2rem;
+          padding-top: 0.2rem;
+          white-space: nowrap;
+        }
+        .history-items {
+          border-top: 1px solid var(--hairline);
+          padding-top: 0;
+        }
+        .history-item-row {
+          display: grid;
+          grid-template-columns: 1.5rem 1fr;
+          gap: 0.75rem;
+          align-items: baseline;
+          padding: 0.6rem 0;
+          border-bottom: 1px solid var(--hairline-soft);
+        }
+        .history-item-row:last-child { border-bottom: none; }
+        .history-bullet {
+          font-family: var(--font-mono);
+          font-size: 0.6rem;
+          color: var(--ink-faint);
+          letter-spacing: 0;
+        }
+        .history-text {
+          font-size: 0.9375rem;
+          color: var(--ink-soft);
+          line-height: 1.6;
+        }
+
+        /* ── 03 운영진: 색인 명단 ── */
+        .staff-table {
+          width: 100%;
+        }
+        .staff-row {
+          display: grid;
+          grid-template-columns: 2rem 1fr auto;
+          align-items: baseline;
+          gap: 1.5rem;
+          padding: 1.1rem 0.5rem;
+          border-bottom: 1px solid var(--hairline);
+          transition: background 140ms ease;
+        }
+        .staff-row:last-child { border-bottom: none; }
+        .staff-row:hover { background: var(--ink); }
+        .staff-idx {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          color: var(--ink-faint);
+          letter-spacing: 0.06em;
+          transition: color 140ms ease;
+        }
+        .staff-row:hover .staff-idx { color: var(--vermilion); }
+        .staff-name-cell {
+          display: flex;
+          align-items: baseline;
+          gap: 1rem;
+          min-width: 0;
+        }
+        .staff-name {
+          font-family: var(--font-serif);
+          font-weight: 700;
+          font-size: 1.1rem;
+          color: var(--ink);
+          transition: color 140ms ease;
+          white-space: nowrap;
+        }
+        .staff-row:hover .staff-name { color: var(--paper); }
         .staff-desc {
           font-size: 0.875rem;
-          color: var(--text-muted);
-          line-height: 1.65;
-          margin: 0;
-        }
-
-        /* ── FAQ ── */
-        .faq-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0;
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
+          color: var(--ink-soft);
           overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          transition: color 140ms ease;
         }
+        .staff-row:hover .staff-desc { color: rgba(246,244,238,0.55); }
+        .staff-role-tag {
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--vermilion);
+          white-space: nowrap;
+          transition: color 140ms ease;
+        }
+        .staff-row:hover .staff-role-tag { color: var(--vermilion); }
+
+        /* ── 04 FAQ: 괘선 행 ── */
         .faq-item {
-          border-bottom: 1px solid var(--border);
+          border-bottom: 1px solid var(--hairline);
         }
-        .faq-item:last-child {
-          border-bottom: none;
-        }
+        .faq-item:last-child { border-bottom: none; }
         .faq-summary {
           display: flex;
-          align-items: flex-start;
+          align-items: baseline;
           justify-content: space-between;
-          gap: 1rem;
-          padding: 1.375rem 1.75rem;
+          gap: 1.5rem;
+          padding: 1.2rem 0.5rem 1.2rem 0;
           cursor: pointer;
           list-style: none;
-          background: var(--background);
-          transition: background 150ms ease;
           user-select: none;
+          transition: background 140ms ease;
         }
         .faq-summary::-webkit-details-marker { display: none; }
-        .faq-summary:hover {
-          background: var(--surface);
+        .faq-summary:hover { background: var(--paper-deep); }
+        .faq-summary-inner {
+          display: flex;
+          align-items: baseline;
+          gap: 1.25rem;
+          flex: 1;
+          min-width: 0;
+        }
+        .faq-q-no {
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
+          letter-spacing: 0.12em;
+          color: var(--vermilion);
+          flex-shrink: 0;
         }
         .faq-q {
-          font-size: 1rem;
+          font-family: var(--font-serif);
           font-weight: 700;
-          letter-spacing: -0.02em;
-          color: var(--foreground);
+          font-size: 1.05rem;
+          color: var(--ink);
           line-height: 1.45;
           margin: 0;
         }
-        .faq-chevron {
+        .faq-toggle {
+          font-family: var(--font-mono);
+          font-size: 0.9rem;
+          color: var(--ink-faint);
           flex-shrink: 0;
-          color: var(--text-subtle);
-          margin-top: 0.1rem;
-          transition: transform 200ms ease;
+          line-height: 1;
+          transition: transform 200ms ease, color 200ms ease;
+          padding-right: 0.5rem;
         }
-        details[open] .faq-chevron {
-          transform: rotate(180deg);
+        details[open] .faq-toggle {
+          transform: rotate(45deg);
+          color: var(--vermilion);
         }
-        details[open] .faq-summary {
-          background: var(--surface);
-        }
-        .faq-a {
-          padding: 0 1.75rem 1.375rem;
-          background: var(--surface);
+        .faq-answer {
+          padding: 0 0.5rem 1.5rem 2.5rem;
           font-size: 0.9375rem;
-          color: var(--text-muted);
-          line-height: 1.75;
+          color: var(--ink-soft);
+          line-height: 1.8;
           margin: 0;
-          border-top: 1px solid var(--border-soft);
+          border-top: 1px solid var(--hairline-soft);
+          padding-top: 1rem;
         }
       `}</style>
 
-      {/* ── 1. Hero ─────────────────────────────────────────────── */}
-      <section className="about-hero">
-        <div className="about-hero-grid" />
+      {/* ── 페이지 헤더 ───────────────────────────────────────── */}
+      <section className="ab-hero">
         <div className="container-page">
-          <div className="about-hero-inner">
-            <span className="page-eyebrow">About</span>
-            <h1 className="about-hero-h1">
-              코드로 연결되는<br />개발자 커뮤니티
-            </h1>
-            <p className="about-hero-sub">
-              세미콜론은 전공·비전공 구분 없이 개발에 관심 있는 사람들이 모여
-              스터디·프로젝트·행사를 통해 함께 성장하는 동아리입니다.
-            </p>
+          <div className="ab-hero-inner">
+            <div className="ab-hero-main">
+              <p className="ab-eyebrow rise rise-1">{'// ABOUT — SEMICOLLON'}</p>
+              <h1 className="ab-h1 rise rise-2">
+                코드로 연결되는<br />개발자 커뮤니티
+              </h1>
+              <p className="ab-lead rise rise-3">
+                세미콜론은 전공·비전공 구분 없이 개발에 관심 있는 사람들이 모여
+                스터디·프로젝트·행사를 통해 함께 성장하는 동아리입니다.
+              </p>
+            </div>
+            <aside className="ab-meta rise rise-4">
+              <div className="ab-meta-row">
+                <span className="ab-meta-k">Founded</span>
+                <span className="ab-meta-v">2024</span>
+              </div>
+              <div className="ab-meta-row">
+                <span className="ab-meta-k">Field</span>
+                <span className="ab-meta-v">SOFTWARE</span>
+              </div>
+              <div className="ab-meta-row">
+                <span className="ab-meta-k">Activity</span>
+                <span className="ab-meta-v">스터디 / 프로젝트</span>
+              </div>
+              <div className="ab-meta-row">
+                <span className="ab-meta-k">Open To</span>
+                <span className="ab-meta-v">전공 무관</span>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* ── 2. 비전 / 하는 일 ────────────────────────────────────── */}
-      <section className="about-section about-section-alt">
+      {/* ── 01 비전 ──────────────────────────────────────────────── */}
+      <section className="ab-sec">
         <div className="container-page">
-          <span className="section-label">Vision &amp; Mission</span>
-          <h2 className="section-h2">우리가 추구하는 것</h2>
-          <p className="section-desc">
-            세미콜론은 네 가지 가치로 구성원의 성장과 연결을 만들어 갑니다.
-          </p>
-
-          <div className="vision-grid">
-            <div className="vision-card">
-              <div className="vision-icon"><IconCode /></div>
-              <div>
-                <p className="vision-card-title">함께 배우기</p>
-                <p className="vision-card-desc">
-                  혼자보다 같이할 때 더 빠릅니다. 주제별 스터디로 꾸준히 학습합니다.
-                </p>
-              </div>
-            </div>
-            <div className="vision-card">
-              <div className="vision-icon"><IconVision /></div>
-              <div>
-                <p className="vision-card-title">직접 만들기</p>
-                <p className="vision-card-desc">
-                  아이디어를 제품으로. 팀 프로젝트를 통해 기획부터 배포까지 경험합니다.
-                </p>
-              </div>
-            </div>
-            <div className="vision-card">
-              <div className="vision-icon"><IconPeople /></div>
-              <div>
-                <p className="vision-card-title">네트워크 넓히기</p>
-                <p className="vision-card-desc">
-                  다양한 배경의 사람들과 연결되어 시야를 넓히고 함께 성장합니다.
-                </p>
-              </div>
-            </div>
-            <div className="vision-card">
-              <div className="vision-icon"><IconEvent /></div>
-              <div>
-                <p className="vision-card-title">세상에 공유하기</p>
-                <p className="vision-card-desc">
-                  세미나·해커톤으로 결과물을 공유하고 외부와 연결됩니다.
-                </p>
-              </div>
-            </div>
+          <div className="ab-sec-head">
+            <span className="section-label">
+              <span className="no">01</span> 우리가 추구하는 것
+            </span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-faint)' }}>
+              Vision &amp; Mission
+            </span>
           </div>
-        </div>
-      </section>
-
-      {/* ── 3. 연혁 ─────────────────────────────────────────────── */}
-      <section className="about-section">
-        <div className="container-page">
-          <span className="section-label">History</span>
-          <h2 className="section-h2">걸어온 길</h2>
-          <p className="section-desc">
-            세미콜론이 지나온 발자취입니다.
-          </p>
-
-          <div className="timeline">
-            {HISTORY.map((entry) => (
-              <div key={entry.year} className="timeline-year-block">
-                <span className="timeline-year">{entry.year}</span>
-                <div className="timeline-line">
-                  <div className="timeline-dot" />
-                  <div className="timeline-connector" />
+          <div className="ab-sec-body">
+            <div className="vision-grid">
+              {VISION.map((v) => (
+                <div key={v.no} className="vision-col">
+                  <div className="vision-no">{v.no}</div>
+                  <div className="vision-en">{v.en}</div>
+                  <h2 className="vision-ko">{v.ko}</h2>
+                  <p className="vision-body">{v.body}</p>
                 </div>
-                <div className="timeline-items">
-                  {entry.items.map((item) => (
-                    <span key={item} className="timeline-item">{item}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── 4. 운영진 ───────────────────────────────────────────── */}
-      <section className="about-section about-section-alt">
+      {/* ── 02 연혁 ──────────────────────────────────────────────── */}
+      <section className="ab-sec">
         <div className="container-page">
-          <span className="section-label">Staff</span>
-          <h2 className="section-h2">운영진 소개</h2>
-          <p className="section-desc">
-            세미콜론을 이끌어가는 운영진입니다.
-          </p>
+          <div className="ab-sec-head">
+            <span className="section-label">
+              <span className="no">02</span> 걸어온 길
+            </span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-faint)' }}>
+              History
+            </span>
+          </div>
+          <div className="ab-sec-body" style={{ paddingBottom: '2.5rem' }}>
+            <table className="history-table">
+              <tbody>
+                {HISTORY.map((entry) => (
+                  <tr key={entry.year} className="history-year-row">
+                    <td className="history-year">{entry.year}</td>
+                    <td className="history-items">
+                      {entry.items.map((item, idx) => (
+                        <div key={item} className="history-item-row">
+                          <span className="history-bullet" aria-hidden="true">
+                            {String(idx + 1).padStart(2, '0')}
+                          </span>
+                          <span className="history-text">{item}</span>
+                        </div>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-          <div className="staff-grid">
-            {STAFF.map((member) => {
-              const initials = member.name.slice(0, 2);
-              return (
-                <div key={member.name} className="staff-card">
-                  <div className="staff-avatar" aria-hidden="true">{initials}</div>
-                  <div className="staff-info">
-                    <p className="staff-name">{member.name}</p>
-                    <span className="staff-role">{member.role}</span>
+      {/* ── 03 운영진 ─────────────────────────────────────────────── */}
+      <section className="ab-sec">
+        <div className="container-page">
+          <div className="ab-sec-head">
+            <span className="section-label">
+              <span className="no">03</span> 운영진 소개
+            </span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-faint)' }}>
+              Staff
+            </span>
+          </div>
+          <div className="ab-sec-body" style={{ paddingBottom: '1rem' }}>
+            <div className="staff-table">
+              {STAFF.map((member, idx) => (
+                <div key={member.name} className="staff-row">
+                  <span className="staff-idx">{String(idx + 1).padStart(2, '0')}</span>
+                  <div className="staff-name-cell">
+                    <span className="staff-name">{member.name}</span>
+                    <span className="staff-desc">{member.desc}</span>
                   </div>
-                  <p className="staff-desc">{member.desc}</p>
+                  <span className="staff-role-tag">{member.role}</span>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── 5. FAQ ──────────────────────────────────────────────── */}
-      <section className="about-section">
+      {/* ── 04 FAQ ────────────────────────────────────────────────── */}
+      <section className="ab-sec" style={{ borderBottom: 'none' }}>
         <div className="container-page">
-          <span className="section-label">FAQ</span>
-          <h2 className="section-h2">자주 묻는 질문</h2>
-          <p className="section-desc">
-            세미콜론에 대해 궁금한 점을 모았습니다.
-          </p>
-
-          <div className="faq-list">
-            {FAQ.map((item) => (
+          <div className="ab-sec-head">
+            <span className="section-label">
+              <span className="no">04</span> 자주 묻는 질문
+            </span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-faint)' }}>
+              FAQ
+            </span>
+          </div>
+          <div className="ab-sec-body" style={{ paddingTop: '0.5rem' }}>
+            {FAQ.map((item, idx) => (
               <div key={item.q} className="faq-item">
                 <details>
                   <summary className="faq-summary">
-                    <p className="faq-q">{item.q}</p>
-                    <svg className="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
+                    <div className="faq-summary-inner">
+                      <span className="faq-q-no">Q{String(idx + 1).padStart(2, '0')}</span>
+                      <p className="faq-q">{item.q}</p>
+                    </div>
+                    <span className="faq-toggle" aria-hidden="true">+</span>
                   </summary>
-                  <p className="faq-a">{item.a}</p>
+                  <p className="faq-answer">{item.a}</p>
                 </details>
               </div>
             ))}

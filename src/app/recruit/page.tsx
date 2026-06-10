@@ -18,54 +18,19 @@ async function fetchRecruitInfo(): Promise<RecruitInfo | null> {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────
-function formatDateKo(iso: string): string {
+function formatDate(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
-}
-
-// ─── SVG Icons ────────────────────────────────────────────────
-function IconArrow() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 8h10M9 4l4 4-4 4" />
-    </svg>
-  );
-}
-
-function IconCheck() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
-function IconCalendar() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-  );
-}
-
-function IconInfo() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
-    </svg>
-  );
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}.${m}.${day}`;
 }
 
 // ─── Process Steps ────────────────────────────────────────────
 const STEPS = [
-  { label: '서류 전형', desc: '지원서 작성 및 제출' },
-  { label: '면접 전형', desc: '운영진과 30분 인터뷰' },
-  { label: '최종 합류', desc: '온보딩 세션 및 활동 시작' },
+  { no: '01', label: '서류 전형', desc: '지원서 작성 및 제출. 개발 경험과 동아리 합류 이유를 솔직하게 써주세요.' },
+  { no: '02', label: '면접 전형', desc: '운영진과 30분 인터뷰. 기술 시험이 아닌 사람을 알아가는 자리입니다.' },
+  { no: '03', label: '최종 합류', desc: '온보딩 세션 및 활동 시작. 첫 스터디부터 바로 합류하게 됩니다.' },
 ];
 
 const ELIGIBILITY = [
@@ -82,554 +47,489 @@ export default async function RecruitPage() {
   return (
     <>
       <style>{`
-        /* ── Page Hero ── */
-        .recruit-hero {
-          position: relative;
-          overflow: hidden;
-          padding: 5rem 1.25rem 4rem;
+        /* ── 페이지 헤더 ── */
+        .rc-hero {
+          border-bottom: 1px solid var(--ink);
         }
-        @media (min-width: 640px) {
-          .recruit-hero { padding: 6rem 2rem 5rem; }
+        .rc-hero-inner {
+          display: grid;
+          grid-template-columns: 1fr;
+          min-height: 44vh;
         }
-        @media (min-width: 1024px) {
-          .recruit-hero { padding: 7rem 2.5rem 6rem; }
-        }
-        .recruit-hero-grid {
-          position: absolute;
-          inset: 0;
-          background-image:
-            linear-gradient(var(--border-soft) 1px, transparent 1px),
-            linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
-          background-size: 40px 40px;
-          mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
-          -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 100%);
-          pointer-events: none;
-        }
-        .recruit-hero-inner {
-          position: relative;
-          max-width: 680px;
-        }
-        .page-eyebrow {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.375rem;
-          padding: 0.3rem 0.875rem;
-          border-radius: 999px;
-          background: var(--accent-light);
-          color: var(--accent);
-          font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          margin-bottom: 1.5rem;
-          border: 1px solid var(--accent-muted);
-        }
-        .page-eyebrow-active {
-          background: var(--accent);
-          color: #fff;
-          border-color: var(--accent-hover);
-        }
-        .recruit-hero-h1 {
-          font-size: clamp(2rem, 5vw, 3.25rem);
-          font-weight: 800;
-          letter-spacing: -0.035em;
-          line-height: 1.15;
-          color: var(--foreground);
-          margin: 0 0 1.25rem;
-        }
-        .recruit-hero-sub {
-          font-size: 1.0625rem;
-          color: var(--text-muted);
-          line-height: 1.8;
-          margin: 0;
-          max-width: 520px;
-        }
-
-        /* ── Section commons ── */
-        .r-section {
-          padding: 5rem 1.25rem;
-        }
-        @media (min-width: 640px) {
-          .r-section { padding: 5rem 2rem; }
-        }
-        @media (min-width: 1024px) {
-          .r-section { padding: 6rem 2.5rem; }
-        }
-        .r-section-alt {
-          background: var(--surface);
-          border-top: 1px solid var(--border);
-          border-bottom: 1px solid var(--border);
-        }
-        .section-label {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: var(--accent);
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          margin-bottom: 0.875rem;
-        }
-        .section-label::before {
-          content: '';
-          display: block;
-          width: 1.5rem;
-          height: 1.5px;
-          background: var(--accent);
-          border-radius: 1px;
-        }
-        .section-h2 {
-          font-size: clamp(1.5rem, 3.5vw, 2.25rem);
-          font-weight: 750;
-          letter-spacing: -0.03em;
-          color: var(--foreground);
-          margin: 0 0 0.75rem;
-        }
-        .section-desc {
-          font-size: 1rem;
-          color: var(--text-muted);
-          margin: 0 0 3rem;
-          max-width: 480px;
-          line-height: 1.75;
-        }
-
-        /* ── Schedule Card ── */
-        .schedule-card {
-          background: var(--background);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          overflow: hidden;
-        }
-        .schedule-header {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 1.25rem 1.75rem;
-          border-bottom: 1px solid var(--border);
-          background: var(--surface);
-        }
-        .schedule-header-icon {
-          color: var(--accent);
-          display: flex;
-          align-items: center;
-        }
-        .schedule-header-title {
-          font-family: var(--font-mono);
-          font-size: 0.8125rem;
-          font-weight: 600;
-          color: var(--text-muted);
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          margin: 0;
-        }
-        .schedule-body {
-          padding: 1.75rem;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        }
-        @media (min-width: 640px) {
-          .schedule-body {
-            flex-direction: row;
-            gap: 3rem;
+        @media (min-width: 900px) {
+          .rc-hero-inner {
+            grid-template-columns: 1fr 220px;
           }
         }
-        .schedule-date-item {
+        .rc-hero-main {
+          padding: 4rem 0 3.5rem;
           display: flex;
           flex-direction: column;
-          gap: 0.25rem;
+          justify-content: flex-end;
+          border-bottom: 1px solid var(--hairline);
         }
-        .schedule-date-label {
-          font-size: 0.8125rem;
-          font-weight: 600;
-          color: var(--text-subtle);
-          letter-spacing: 0.04em;
+        @media (min-width: 900px) {
+          .rc-hero-main {
+            border-bottom: none;
+            border-right: 1px solid var(--hairline);
+            padding-right: 3rem;
+          }
+        }
+        .rc-eyebrow {
+          font-family: var(--font-mono);
+          font-size: 0.78rem;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
+          margin-bottom: 1.5rem;
         }
-        .schedule-date-value {
-          font-size: 1.125rem;
-          font-weight: 700;
-          color: var(--foreground);
+        .rc-eyebrow-open { color: var(--vermilion); }
+        .rc-eyebrow-closed { color: var(--ink-faint); }
+        .rc-h1 {
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: clamp(2.25rem, 6vw, 4rem);
+          line-height: 1.18;
           letter-spacing: -0.02em;
+          color: var(--ink);
+          margin: 0 0 1.5rem;
         }
-        .schedule-date-divider {
-          display: none;
-          width: 1px;
-          background: var(--border);
-          align-self: stretch;
+        .rc-lead {
+          max-width: 36rem;
+          font-size: 1.0625rem;
+          line-height: 1.85;
+          color: var(--ink-soft);
+          margin: 0;
         }
-        @media (min-width: 640px) {
-          .schedule-date-divider { display: block; }
+        /* 우측 상태 칼럼 */
+        .rc-meta {
+          display: flex;
+          flex-direction: column;
+        }
+        @media (min-width: 900px) {
+          .rc-meta {
+            padding-left: 2rem;
+            padding-top: 4rem;
+          }
+        }
+        .rc-meta-row {
+          padding: 0.9rem 0;
+          border-bottom: 1px solid var(--hairline-soft);
+        }
+        .rc-meta-row:last-child { border-bottom: none; }
+        .rc-meta-k {
+          font-family: var(--font-mono);
+          font-size: 0.62rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
+          display: block;
+          margin-bottom: 0.2rem;
+        }
+        .rc-meta-v {
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          color: var(--ink);
+        }
+        .rc-meta-v-open { color: var(--vermilion); }
+
+        /* ── 섹션 공통 ── */
+        .rc-sec {
+          border-bottom: 1px solid var(--ink);
+        }
+        .rc-sec-head {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 1rem;
+          padding: 1.1rem 0;
+          border-bottom: 1px solid var(--hairline);
+        }
+        .rc-sec-body {
+          padding: 3rem 0 4rem;
+        }
+        .rc-sec-en {
+          font-family: var(--font-mono);
+          font-size: 0.7rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
         }
 
-        /* ── Eligibility ── */
-        .eligibility-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
+        /* ── 01 일정 ── */
+        .schedule-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+        @media (min-width: 640px) {
+          .schedule-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        .schedule-cell {
+          padding: 1.75rem 0;
+          border-bottom: 1px solid var(--hairline-soft);
+        }
+        @media (min-width: 640px) {
+          .schedule-cell {
+            padding: 1.75rem 2.5rem 1.75rem 0;
+            border-bottom: none;
+            border-right: 1px solid var(--hairline);
+          }
+          .schedule-cell:last-child {
+            border-right: none;
+            padding-left: 2.5rem;
+            padding-right: 0;
+          }
+        }
+        .schedule-cell:last-child { border-bottom: none; }
+        .schedule-k {
+          font-family: var(--font-mono);
+          font-size: 0.65rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
+          margin-bottom: 0.5rem;
+        }
+        .schedule-v {
+          font-family: var(--font-mono);
+          font-size: 1.35rem;
+          font-weight: 600;
+          color: var(--ink);
+          letter-spacing: 0.02em;
+        }
+        .schedule-v-em { color: var(--vermilion); }
+        .schedule-note {
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          color: var(--ink-faint);
+          margin-top: 0.375rem;
+        }
+
+        /* ── 02 모집 대상 ── */
+        .elig-list {
           list-style: none;
           padding: 0;
           margin: 0;
         }
-        .eligibility-item {
-          display: flex;
-          align-items: flex-start;
+        .elig-item {
+          display: grid;
+          grid-template-columns: 2rem 1fr;
+          align-items: baseline;
           gap: 0.75rem;
-          font-size: 0.9375rem;
-          color: var(--text-muted);
-          line-height: 1.6;
+          padding: 1rem 0.5rem;
+          border-bottom: 1px solid var(--hairline);
         }
-        .eligibility-check {
-          flex-shrink: 0;
-          width: 1.375rem;
-          height: 1.375rem;
-          border-radius: 50%;
-          background: var(--accent-light);
-          color: var(--accent);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-top: 0.0625rem;
+        .elig-item:last-child { border-bottom: none; }
+        .elig-no {
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          letter-spacing: 0.1em;
+          color: var(--vermilion);
+        }
+        .elig-text {
+          font-size: 0.9375rem;
+          color: var(--ink-soft);
+          line-height: 1.65;
         }
 
-        /* ── Process Steps ── */
-        .steps-row {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
+        /* ── 03 지원 과정 ── */
+        .steps-grid {
+          display: grid;
+          grid-template-columns: 1fr;
         }
         @media (min-width: 680px) {
-          .steps-row {
-            flex-direction: row;
-            align-items: stretch;
-            gap: 0;
-          }
+          .steps-grid { grid-template-columns: repeat(3, 1fr); }
         }
-        .step-item {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 0.875rem;
-          padding: 1.75rem;
-          background: var(--background);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          position: relative;
+        .step-col {
+          padding: 2rem 0;
+          border-bottom: 1px solid var(--hairline-soft);
         }
         @media (min-width: 680px) {
-          .step-item {
-            border-radius: 0;
-            border-right-width: 0;
+          .step-col {
+            padding: 2.25rem 2.25rem 2.25rem 0;
+            border-bottom: none;
+            border-right: 1px solid var(--hairline);
           }
-          .step-item:first-child {
-            border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-          }
-          .step-item:last-child {
-            border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-            border-right-width: 1px;
-          }
+          .step-col:not(:first-child) { padding-left: 2.25rem; }
+          .step-col:last-child { border-right: none; }
         }
-        .step-number {
+        .step-no {
           font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 700;
-          color: var(--accent);
-          letter-spacing: 0.1em;
+          font-size: 0.65rem;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
+          color: var(--vermilion);
+          margin-bottom: 1rem;
         }
         .step-label {
-          font-size: 1rem;
+          font-family: var(--font-serif);
           font-weight: 700;
-          letter-spacing: -0.02em;
-          color: var(--foreground);
-          margin: 0;
+          font-size: 1.2rem;
+          color: var(--ink);
+          margin: 0 0 0.75rem;
         }
         .step-desc {
-          font-size: 0.875rem;
-          color: var(--text-muted);
+          font-size: 0.9rem;
+          line-height: 1.85;
+          color: var(--ink-soft);
           margin: 0;
-          line-height: 1.6;
-        }
-        .step-connector {
-          display: none;
-        }
-        @media (min-width: 680px) {
-          .step-connector {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            width: 2rem;
-            color: var(--text-subtle);
-          }
         }
 
-        /* ── CTA ── */
-        .recruit-cta-section {
-          padding: 4rem 1.25rem;
+        /* ── CTA 잉크 블록 ── */
+        .rc-cta-band {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1.75rem;
+          padding: 3.5rem 0;
         }
-        @media (min-width: 640px) {
-          .recruit-cta-section { padding: 5rem 2rem; }
-        }
-        @media (min-width: 1024px) {
-          .recruit-cta-section { padding: 5rem 2.5rem; }
-        }
-        .recruit-cta-box {
-          background: var(--accent);
-          border-radius: var(--radius-xl);
-          padding: 2.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-        @media (min-width: 640px) {
-          .recruit-cta-box {
-            flex-direction: row;
+        @media (min-width: 768px) {
+          .rc-cta-band {
+            grid-template-columns: 1fr auto;
             align-items: center;
-            justify-content: space-between;
-            padding: 2.5rem 3rem;
           }
         }
-        .cta-box-content { display: flex; flex-direction: column; gap: 0.5rem; }
-        .cta-eyebrow {
+        .rc-cta-title {
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+          line-height: 1.3;
+          color: var(--paper);
+          margin: 0;
+        }
+        .rc-cta-deadline {
           font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: #c7d2fe;
+          font-size: 0.8rem;
+          letter-spacing: 0.06em;
+          color: rgba(246,244,238,0.55);
+          margin-top: 0.75rem;
         }
-        .cta-title {
-          font-size: clamp(1.25rem, 3vw, 1.75rem);
-          font-weight: 750;
-          letter-spacing: -0.03em;
-          line-height: 1.2;
+        .btn-onink {
+          border-color: var(--paper);
+          background: transparent;
+          color: var(--paper);
+        }
+        .btn-onink:hover {
+          background: var(--vermilion);
+          border-color: var(--vermilion);
           color: #fff;
-          margin: 0;
         }
-        .cta-sub {
-          font-size: 0.9375rem;
-          color: #e0e7ff;
-          margin: 0;
-          line-height: 1.6;
-        }
-        .cta-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-weight: 600;
-          font-size: 0.9375rem;
-          border-radius: 999px;
-          padding: 0.75rem 1.75rem;
-          border: 1.5px solid rgba(255,255,255,0.45);
-          color: #fff;
-          background: rgba(255,255,255,0.12);
-          text-decoration: none;
-          white-space: nowrap;
-          transition: background 150ms ease, border-color 150ms ease, transform 100ms ease;
-          flex-shrink: 0;
-          cursor: pointer;
-        }
-        .cta-btn:hover {
-          background: rgba(255,255,255,0.22);
-          border-color: rgba(255,255,255,0.7);
-        }
-        .cta-btn:active { transform: translateY(1px); }
 
-        /* ── Closed State ── */
-        .closed-card {
-          background: var(--surface);
-          border: 1.5px dashed var(--border);
-          border-radius: var(--radius-xl);
-          padding: 4rem 2rem;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          gap: 1.5rem;
+        /* ── 모집 아님 ── */
+        .closed-section {
+          border-bottom: none;
         }
-        .closed-icon {
-          width: 3.5rem;
-          height: 3.5rem;
-          border-radius: 50%;
-          background: var(--surface-alt);
-          color: var(--text-subtle);
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .closed-inner {
+          padding: 5rem 0 6rem;
+          max-width: 44rem;
         }
-        .closed-label {
+        .closed-status {
           font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: var(--text-subtle);
-          letter-spacing: 0.1em;
+          font-size: 0.78rem;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
-          margin: 0;
+          color: var(--ink-faint);
+          margin-bottom: 2rem;
         }
-        .closed-title {
-          font-size: clamp(1.375rem, 3vw, 1.875rem);
-          font-weight: 750;
-          letter-spacing: -0.03em;
-          color: var(--foreground);
-          margin: 0;
+        .closed-status::before {
+          content: '○ ';
+          color: var(--ink-faint);
+        }
+        .closed-h {
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: clamp(1.75rem, 4vw, 2.75rem);
           line-height: 1.25;
+          color: var(--ink);
+          margin: 0 0 1.25rem;
         }
         .closed-desc {
-          font-size: 1rem;
-          color: var(--text-muted);
-          margin: 0;
-          max-width: 440px;
-          line-height: 1.75;
+          font-size: 1.0625rem;
+          line-height: 1.85;
+          color: var(--ink-soft);
+          margin: 0 0 2.5rem;
+          max-width: 36rem;
+        }
+        .closed-rule {
+          border: 0;
+          border-top: 1px solid var(--hairline);
+          margin: 0 0 2.5rem;
         }
       `}</style>
 
-      {/* ── 1. Hero ─────────────────────────────────────────────── */}
-      <section className="recruit-hero">
-        <div className="recruit-hero-grid" />
+      {/* ── 페이지 헤더 ───────────────────────────────────────── */}
+      <section className="rc-hero">
         <div className="container-page">
-          <div className="recruit-hero-inner">
-            <span className={`page-eyebrow${isRecruiting ? ' page-eyebrow-active' : ''}`}>
-              {isRecruiting ? 'Recruiting Now' : 'Recruit'}
-            </span>
-            <h1 className="recruit-hero-h1">
-              세미콜론과<br />함께 성장하세요
-            </h1>
-            <p className="recruit-hero-sub">
-              개발에 관심 있다면 누구든 환영합니다.
-              스터디·프로젝트·행사를 통해 함께 성장할 동료를 기다립니다.
-            </p>
+          <div className="rc-hero-inner">
+            <div className="rc-hero-main">
+              <p className={`rc-eyebrow rise rise-1 ${isRecruiting ? 'rc-eyebrow-open' : 'rc-eyebrow-closed'}`}>
+                {isRecruiting ? '● RECRUITING NOW — SEMICOLLON' : '○ RECRUIT — SEMICOLLON'}
+              </p>
+              <h1 className="rc-h1 rise rise-2">
+                {isRecruiting ? (
+                  <>지금, 새로운 부원을<br />기다리고 있습니다<span style={{ color: 'var(--vermilion)' }}>;</span></>
+                ) : (
+                  <>세미콜론과<br />함께 성장하세요</>
+                )}
+              </h1>
+              <p className="rc-lead rise rise-3">
+                개발에 관심 있다면 누구든 환영합니다.
+                스터디·프로젝트·행사를 통해 함께 성장할 동료를 기다립니다.
+              </p>
+            </div>
+            <aside className="rc-meta rise rise-4">
+              <div className="rc-meta-row">
+                <span className="rc-meta-k">Status</span>
+                <span className={`rc-meta-v ${isRecruiting ? 'rc-meta-v-open' : ''}`}>
+                  {isRecruiting ? '● OPEN' : '○ CLOSED'}
+                </span>
+              </div>
+              {isRecruiting && recruit?.start && (
+                <div className="rc-meta-row">
+                  <span className="rc-meta-k">Start</span>
+                  <span className="rc-meta-v">{formatDate(recruit.start)}</span>
+                </div>
+              )}
+              {isRecruiting && recruit?.end && (
+                <div className="rc-meta-row">
+                  <span className="rc-meta-k">Deadline</span>
+                  <span className="rc-meta-v">{formatDate(recruit.end)}</span>
+                </div>
+              )}
+              <div className="rc-meta-row">
+                <span className="rc-meta-k">Open To</span>
+                <span className="rc-meta-v">전공 무관</span>
+              </div>
+              <div className="rc-meta-row">
+                <span className="rc-meta-k">Process</span>
+                <span className="rc-meta-v">서류 → 면접 → 합류</span>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
       {isRecruiting ? (
         <>
-          {/* ── 2. 일정 ─────────────────────────────────────────── */}
-          <section className="r-section r-section-alt">
+          {/* ── 01 일정 ──────────────────────────────────────────── */}
+          <section className="rc-sec">
             <div className="container-page">
-              <span className="section-label">Schedule</span>
-              <h2 className="section-h2">모집 일정</h2>
-              <p className="section-desc" style={{ marginBottom: '2rem' }}>
-                아래 일정을 확인하고 마감 전에 지원서를 제출해 주세요.
-              </p>
-
-              <div className="schedule-card">
-                <div className="schedule-header">
-                  <span className="schedule-header-icon"><IconCalendar /></span>
-                  <p className="schedule-header-title">모집 기간</p>
-                </div>
-                <div className="schedule-body">
-                  {recruit?.start && (
-                    <div className="schedule-date-item">
-                      <span className="schedule-date-label">시작일</span>
-                      <span className="schedule-date-value">{formatDateKo(recruit.start)}</span>
+              <div className="rc-sec-head">
+                <span className="section-label">
+                  <span className="no">01</span> 모집 일정
+                </span>
+                <span className="rc-sec-en">Schedule</span>
+              </div>
+              <div className="rc-sec-body">
+                <div className="schedule-grid">
+                  {recruit?.start ? (
+                    <div className="schedule-cell">
+                      <div className="schedule-k">시작일</div>
+                      <div className="schedule-v">{formatDate(recruit.start)}</div>
+                      <div className="schedule-note">모집 개시</div>
                     </div>
-                  )}
-                  {recruit?.start && recruit?.end && (
-                    <div className="schedule-date-divider" />
-                  )}
-                  {recruit?.end && (
-                    <div className="schedule-date-item">
-                      <span className="schedule-date-label">마감일</span>
-                      <span className="schedule-date-value">{formatDateKo(recruit.end)}</span>
+                  ) : null}
+                  {recruit?.end ? (
+                    <div className="schedule-cell">
+                      <div className="schedule-k">마감일</div>
+                      <div className="schedule-v schedule-v-em">{formatDate(recruit.end)}</div>
+                      <div className="schedule-note">이 날짜까지 지원서를 제출하세요</div>
                     </div>
-                  )}
+                  ) : null}
                   {!recruit?.start && !recruit?.end && (
-                    <p style={{ fontSize: '0.9375rem', color: 'var(--text-muted)', margin: 0 }}>
-                      일정이 곧 공지될 예정입니다.
+                    <div className="schedule-cell" style={{ gridColumn: '1 / -1' }}>
+                      <div className="schedule-k">일정</div>
+                      <div className="schedule-v" style={{ fontSize: '1rem', fontWeight: '400', color: 'var(--ink-soft)' }}>
+                        일정이 곧 공지될 예정입니다
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ── 02 모집 대상 ──────────────────────────────────────── */}
+          <section className="rc-sec">
+            <div className="container-page">
+              <div className="rc-sec-head">
+                <span className="section-label">
+                  <span className="no">02</span> 모집 대상
+                </span>
+                <span className="rc-sec-en">Eligibility</span>
+              </div>
+              <div className="rc-sec-body" style={{ paddingBottom: '2rem' }}>
+                <ul className="elig-list">
+                  {ELIGIBILITY.map((item, idx) => (
+                    <li key={item} className="elig-item">
+                      <span className="elig-no">{String(idx + 1).padStart(2, '0')}</span>
+                      <span className="elig-text">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* ── 03 지원 과정 ──────────────────────────────────────── */}
+          <section className="rc-sec">
+            <div className="container-page">
+              <div className="rc-sec-head">
+                <span className="section-label">
+                  <span className="no">03</span> 지원 과정
+                </span>
+                <span className="rc-sec-en">Process</span>
+              </div>
+              <div className="rc-sec-body">
+                <div className="steps-grid">
+                  {STEPS.map((step) => (
+                    <div key={step.no} className="step-col">
+                      <div className="step-no">STEP {step.no}</div>
+                      <h2 className="step-label">{step.label}</h2>
+                      <p className="step-desc">{step.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ── CTA 잉크 블록 ─────────────────────────────────────── */}
+          <section className="ink-block">
+            <div className="container-page">
+              <div className="rc-cta-band">
+                <div>
+                  <h2 className="rc-cta-title">
+                    지금 바로<br />지원서를 작성하세요
+                  </h2>
+                  {recruit?.end && (
+                    <p className="rc-cta-deadline">
+                      DEADLINE — {formatDate(recruit.end)}
                     </p>
                   )}
                 </div>
-              </div>
-            </div>
-          </section>
-
-          {/* ── 3. 모집 대상 ─────────────────────────────────────── */}
-          <section className="r-section">
-            <div className="container-page">
-              <span className="section-label">Who We&apos;re Looking For</span>
-              <h2 className="section-h2">모집 대상</h2>
-              <p className="section-desc">
-                이런 분이라면 세미콜론에서 함께하기 좋습니다.
-              </p>
-
-              <ul className="eligibility-list">
-                {ELIGIBILITY.map((item) => (
-                  <li key={item} className="eligibility-item">
-                    <span className="eligibility-check"><IconCheck /></span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          {/* ── 4. 지원 과정 ─────────────────────────────────────── */}
-          <section className="r-section r-section-alt">
-            <div className="container-page">
-              <span className="section-label">Process</span>
-              <h2 className="section-h2">지원 과정</h2>
-              <p className="section-desc">
-                서류부터 합류까지 세 단계로 진행됩니다.
-              </p>
-
-              <div className="steps-row">
-                {STEPS.map((step, i) => (
-                  <>
-                    <div key={step.label} className="step-item">
-                      <span className="step-number">Step {String(i + 1).padStart(2, '0')}</span>
-                      <p className="step-label">{step.label}</p>
-                      <p className="step-desc">{step.desc}</p>
-                    </div>
-                    {i < STEPS.length - 1 && (
-                      <div className="step-connector" aria-hidden="true">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M3 8h10M9 4l4 4-4 4" />
-                        </svg>
-                      </div>
-                    )}
-                  </>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* ── 5. CTA ──────────────────────────────────────────── */}
-          <section className="recruit-cta-section">
-            <div className="container-page">
-              <div className="recruit-cta-box">
-                <div className="cta-box-content">
-                  <span className="cta-eyebrow">Apply Now</span>
-                  <h2 className="cta-title">지금 바로 지원하세요</h2>
-                  {recruit?.end && (
-                    <p className="cta-sub">마감: {formatDateKo(recruit.end)}</p>
-                  )}
-                </div>
-                <Link href="/recruit/apply" className="cta-btn">
-                  지원서 작성하기 <IconArrow />
+                <Link href="/recruit/apply" className="btn btn-onink">
+                  지원서 작성하기 →
                 </Link>
               </div>
             </div>
           </section>
         </>
       ) : (
-        /* ── 모집 아님 상태 ──────────────────────────────────────── */
-        <section className="r-section">
+        /* ── 모집 아님 ────────────────────────────────────────────── */
+        <section className="rc-sec closed-section">
           <div className="container-page">
-            <div className="closed-card">
-              <div className="closed-icon">
-                <IconInfo />
-              </div>
-              <p className="closed-label">Not Recruiting</p>
-              <h2 className="closed-title">지금은 모집 기간이 아닙니다</h2>
+            <div className="closed-inner">
+              <p className="closed-status">Not Recruiting</p>
+              <h2 className="closed-h">
+                지금은 모집 기간이<br />아닙니다
+              </h2>
               <p className="closed-desc">
                 현재 신입 기수 모집이 진행되지 않습니다.
-                공지사항을 통해 다음 모집 일정을 안내드릴 예정이니 기대해 주세요.
+                공지사항을 통해 다음 모집 일정을 안내드릴 예정이니
+                관심 있으시면 소개 페이지를 먼저 읽어보세요.
               </p>
+              <hr className="closed-rule" />
               <Link href="/about" className="btn btn-ghost">
                 동아리 소개 보기
               </Link>
