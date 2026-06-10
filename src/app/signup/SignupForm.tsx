@@ -25,19 +25,19 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-// ─── Icons ────────────────────────────────────────────────────
+// ─── Spinner ──────────────────────────────────────────────────
 function IconSpinner() {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth="2.5"
       strokeLinecap="round"
       aria-hidden="true"
-      style={{ animation: 'spin 0.75s linear infinite' }}
+      style={{ animation: 'auth-spin 0.75s linear infinite' }}
     >
       <path d="M12 2a10 10 0 0 1 10 10" />
     </svg>
@@ -95,166 +95,204 @@ export default function SignupForm() {
     <>
       <style>{STYLES}</style>
       <div className="auth-page">
-        <div className="auth-grid" aria-hidden="true" />
-        <div className="auth-card auth-card-wide">
-          {/* Header */}
-          <div className="auth-card-header">
-            <Link href="/" className="auth-logo">
-              Semicollon<span className="auth-logo-dot">;</span>
+        {/* 왼쪽 아이덴티티 패널 */}
+        <aside className="auth-side" aria-hidden="true">
+          <div className="auth-side-inner">
+            <Link href="/" className="auth-side-logo">
+              Semicollon<span className="auth-side-semi">;</span>
             </Link>
-            <span className="auth-eyebrow">Sign up</span>
-            <h1 className="auth-title">부원 가입</h1>
-            <p className="auth-subtitle">운영진으로부터 받은 초대 코드로 가입하세요.</p>
-          </div>
-
-          {/* Form */}
-          <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-            {/* Server error */}
-            {serverError && (
-              <div className="auth-server-error" role="alert">
-                <span className="auth-server-error-icon" aria-hidden="true">!</span>
-                <p className="auth-server-error-text">{serverError}</p>
-              </div>
-            )}
-
-            {/* Two-col row: 이름 + 기수 */}
-            <div className="auth-row">
-              <div className="auth-field">
-                <label className="auth-label" htmlFor="signup-name">
-                  이름 <span className="auth-required" aria-hidden="true">*</span>
-                </label>
-                <input
-                  id="signup-name"
-                  type="text"
-                  className={`auth-input${errors.name ? ' auth-input-error' : ''}`}
-                  placeholder="홍길동"
-                  autoComplete="name"
-                  aria-invalid={!!errors.name}
-                  aria-describedby={errors.name ? 'signup-name-error' : undefined}
-                  {...register('name')}
-                />
-                {errors.name && (
-                  <p id="signup-name-error" className="auth-error" role="alert">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-              <div className="auth-field">
-                <label className="auth-label" htmlFor="signup-generation">
-                  기수 <span className="auth-required" aria-hidden="true">*</span>
-                </label>
-                <input
-                  id="signup-generation"
-                  type="number"
-                  min="1"
-                  className={`auth-input${errors.generation ? ' auth-input-error' : ''}`}
-                  placeholder="1"
-                  aria-invalid={!!errors.generation}
-                  aria-describedby={errors.generation ? 'signup-generation-error' : undefined}
-                  {...register('generation')}
-                />
-                {errors.generation && (
-                  <p id="signup-generation-error" className="auth-error" role="alert">
-                    {errors.generation.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Email */}
-            <div className="auth-field">
-              <label className="auth-label" htmlFor="signup-email">
-                이메일 <span className="auth-required" aria-hidden="true">*</span>
-              </label>
-              <input
-                id="signup-email"
-                type="email"
-                className={`auth-input${errors.email ? ' auth-input-error' : ''}`}
-                placeholder="hong@example.com"
-                autoComplete="email"
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? 'signup-email-error' : undefined}
-                {...register('email')}
-              />
-              {errors.email && (
-                <p id="signup-email-error" className="auth-error" role="alert">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div className="auth-field">
-              <label className="auth-label" htmlFor="signup-password">
-                비밀번호 <span className="auth-required" aria-hidden="true">*</span>
-              </label>
-              <input
-                id="signup-password"
-                type="password"
-                className={`auth-input${errors.password ? ' auth-input-error' : ''}`}
-                placeholder="8자 이상"
-                autoComplete="new-password"
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? 'signup-password-error' : undefined}
-                {...register('password')}
-              />
-              {errors.password && (
-                <p id="signup-password-error" className="auth-error" role="alert">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            {/* Invite Code */}
-            <div className="auth-field">
-              <label className="auth-label" htmlFor="signup-invite">
-                초대 코드 <span className="auth-required" aria-hidden="true">*</span>
-              </label>
-              <input
-                id="signup-invite"
-                type="text"
-                className={`auth-input${errors.inviteCode ? ' auth-input-error' : ''}`}
-                placeholder="운영진에게 받은 초대 코드"
-                autoComplete="off"
-                aria-invalid={!!errors.inviteCode}
-                aria-describedby={errors.inviteCode ? 'signup-invite-error' : undefined}
-                {...register('inviteCode')}
-              />
-              {errors.inviteCode && (
-                <p id="signup-invite-error" className="auth-error" role="alert">
-                  {errors.inviteCode.message}
-                </p>
-              )}
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              className="auth-submit-btn"
-              disabled={isSubmitting}
-              aria-busy={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <IconSpinner />
-                  가입 중…
-                </>
-              ) : (
-                '가입하기'
-              )}
-            </button>
-          </form>
-
-          {/* Footer links */}
-          <div className="auth-card-footer">
-            <p className="auth-footer-text">
-              이미 계정이 있으신가요?{' '}
-              <Link href="/login" className="auth-footer-link">
-                로그인
-              </Link>
+            <p className="auth-side-tagline">
+              한 줄의 끝에서,<br />같이 다음 줄을 쓴다<span style={{ color: 'var(--vermilion)' }}>;</span>
             </p>
+            <div className="auth-side-meta">
+              <div className="auth-side-meta-row">
+                <span className="auth-side-meta-k">Type</span>
+                <span className="auth-side-meta-v">Member Portal</span>
+              </div>
+              <div className="auth-side-meta-row">
+                <span className="auth-side-meta-k">Access</span>
+                <span className="auth-side-meta-v">초대 코드 필요</span>
+              </div>
+            </div>
           </div>
-        </div>
+        </aside>
+
+        {/* 오른쪽 폼 패널 */}
+        <main className="auth-main">
+          <div className="auth-form-wrap">
+            {/* 모바일 로고 */}
+            <Link href="/" className="auth-mobile-logo">
+              Semicollon<span style={{ color: 'var(--vermilion)' }}>;</span>
+            </Link>
+
+            {/* 헤더 */}
+            <div className="auth-form-header">
+              <p className="auth-form-eyebrow">SIGN UP</p>
+              <h1 className="auth-form-title">부원 가입</h1>
+              <p className="auth-form-subtitle">운영진으로부터 받은 초대 코드로 가입하세요.</p>
+            </div>
+
+            {/* 폼 */}
+            <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
+              {/* 서버 에러 */}
+              {serverError && (
+                <div className="auth-server-error" role="alert">
+                  <span className="auth-server-error-tag">ERROR</span>
+                  <p className="auth-server-error-text">{serverError}</p>
+                </div>
+              )}
+
+              {/* 01 이름 + 02 기수 — 2열 */}
+              <div className="auth-row-2col">
+                <div className="auth-field">
+                  <label className="auth-label" htmlFor="signup-name">
+                    <span className="auth-field-no">01</span>
+                    이름
+                    <span className="auth-required" aria-hidden="true"> *</span>
+                  </label>
+                  <input
+                    id="signup-name"
+                    type="text"
+                    className={`auth-input${errors.name ? ' auth-input-error' : ''}`}
+                    placeholder="홍길동"
+                    autoComplete="name"
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? 'signup-name-error' : undefined}
+                    {...register('name')}
+                  />
+                  {errors.name && (
+                    <p id="signup-name-error" className="auth-error" role="alert">
+                      {errors.name.message}
+                    </p>
+                  )}
+                </div>
+                <div className="auth-field">
+                  <label className="auth-label" htmlFor="signup-generation">
+                    <span className="auth-field-no">02</span>
+                    기수
+                    <span className="auth-required" aria-hidden="true"> *</span>
+                  </label>
+                  <input
+                    id="signup-generation"
+                    type="number"
+                    min="1"
+                    className={`auth-input${errors.generation ? ' auth-input-error' : ''}`}
+                    placeholder="1"
+                    aria-invalid={!!errors.generation}
+                    aria-describedby={errors.generation ? 'signup-generation-error' : undefined}
+                    {...register('generation')}
+                  />
+                  {errors.generation && (
+                    <p id="signup-generation-error" className="auth-error" role="alert">
+                      {errors.generation.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* 03 이메일 */}
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="signup-email">
+                  <span className="auth-field-no">03</span>
+                  이메일
+                  <span className="auth-required" aria-hidden="true"> *</span>
+                </label>
+                <input
+                  id="signup-email"
+                  type="email"
+                  className={`auth-input${errors.email ? ' auth-input-error' : ''}`}
+                  placeholder="hong@example.com"
+                  autoComplete="email"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? 'signup-email-error' : undefined}
+                  {...register('email')}
+                />
+                {errors.email && (
+                  <p id="signup-email-error" className="auth-error" role="alert">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              {/* 04 비밀번호 */}
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="signup-password">
+                  <span className="auth-field-no">04</span>
+                  비밀번호
+                  <span className="auth-required" aria-hidden="true"> *</span>
+                </label>
+                <input
+                  id="signup-password"
+                  type="password"
+                  className={`auth-input${errors.password ? ' auth-input-error' : ''}`}
+                  placeholder="8자 이상"
+                  autoComplete="new-password"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? 'signup-password-error' : undefined}
+                  {...register('password')}
+                />
+                {errors.password && (
+                  <p id="signup-password-error" className="auth-error" role="alert">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              {/* 05 초대 코드 */}
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="signup-invite">
+                  <span className="auth-field-no">05</span>
+                  초대 코드
+                  <span className="auth-required" aria-hidden="true"> *</span>
+                </label>
+                <input
+                  id="signup-invite"
+                  type="text"
+                  className={`auth-input${errors.inviteCode ? ' auth-input-error' : ''}`}
+                  placeholder="운영진에게 받은 초대 코드"
+                  autoComplete="off"
+                  aria-invalid={!!errors.inviteCode}
+                  aria-describedby={errors.inviteCode ? 'signup-invite-error' : undefined}
+                  {...register('inviteCode')}
+                />
+                {errors.inviteCode && (
+                  <p id="signup-invite-error" className="auth-error" role="alert">
+                    {errors.inviteCode.message}
+                  </p>
+                )}
+              </div>
+
+              {/* 제출 */}
+              <div className="auth-submit-row">
+                <button
+                  type="submit"
+                  className="btn btn-primary auth-submit-btn"
+                  disabled={isSubmitting}
+                  aria-busy={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <IconSpinner />
+                      가입 중…
+                    </>
+                  ) : (
+                    '가입하기'
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* 푸터 링크 */}
+            <div className="auth-form-footer">
+              <p className="auth-footer-text">
+                이미 계정이 있으신가요?{' '}
+                <Link href="/login" className="auth-footer-link">
+                  로그인
+                </Link>
+              </p>
+            </div>
+          </div>
+        </main>
       </div>
     </>
   );
@@ -262,273 +300,305 @@ export default function SignupForm() {
 
 // ─── Styles ───────────────────────────────────────────────────
 const STYLES = `
-@keyframes spin {
+@keyframes auth-spin {
   to { transform: rotate(360deg); }
 }
-@keyframes auth-fade-up {
-  from { opacity: 0; transform: translateY(16px); }
+@keyframes auth-rise {
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── 2단 레이아웃 ── */
 .auth-page {
-  position: relative;
   min-height: calc(100dvh - 3.75rem);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1.25rem;
-  overflow: hidden;
+  flex-direction: column;
+}
+@media (min-width: 760px) {
+  .auth-page { flex-direction: row; }
 }
 
-.auth-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border-soft) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, black 20%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, black 20%, transparent 100%);
-  pointer-events: none;
+/* 왼쪽 패널 */
+.auth-side {
+  display: none;
 }
-
-.auth-card {
-  position: relative;
-  width: 100%;
-  max-width: 420px;
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  animation: auth-fade-up 0.35s ease both;
+@media (min-width: 760px) {
+  .auth-side {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--ink);
+    border-right: 1px solid var(--ink);
+  }
 }
-
-.auth-card-wide {
-  max-width: 480px;
+@media (min-width: 1024px) {
+  .auth-side { width: 360px; }
 }
-
-.auth-card-header {
-  padding: 2rem 2rem 1.5rem;
-  border-bottom: 1px solid var(--border-soft);
+.auth-side-inner {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  justify-content: space-between;
+  padding: 3rem 2.5rem;
+}
+.auth-side-logo {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+  text-decoration: none;
+}
+.auth-side-semi { color: var(--vermilion); }
+.auth-side-tagline {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.45rem;
+  line-height: 1.5;
+  color: var(--paper);
+  margin: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.auth-side-meta {
+  border-top: 1px solid rgba(246, 244, 238, 0.15);
+  padding-top: 1.5rem;
+}
+.auth-side-meta-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(246, 244, 238, 0.08);
+}
+.auth-side-meta-row:last-child { border-bottom: none; }
+.auth-side-meta-k {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(246, 244, 238, 0.4);
+}
+.auth-side-meta-v {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgba(246, 244, 238, 0.75);
 }
 
-.auth-logo {
-  display: inline-flex;
-  align-items: center;
+/* 오른쪽 폼 패널 */
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1.5rem 4rem;
+  background: var(--paper);
+  overflow-y: auto;
+}
+@media (min-width: 760px) {
+  .auth-main { align-items: center; }
+}
+.auth-form-wrap {
+  width: 100%;
+  max-width: 460px;
+  animation: auth-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.auth-mobile-logo {
+  display: inline-block;
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 1rem;
-  color: var(--foreground);
+  color: var(--ink);
   text-decoration: none;
-  margin-bottom: 1.25rem;
-  letter-spacing: -0.03em;
+  margin-bottom: 2rem;
 }
-.auth-logo-dot {
-  color: var(--accent);
+@media (min-width: 760px) {
+  .auth-mobile-logo { display: none; }
 }
 
-.auth-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.75rem;
-  border-radius: 999px;
-  background: var(--accent-light);
-  color: var(--accent);
+/* 폼 헤더 */
+.auth-form-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--ink);
+}
+.auth-form-eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  border: 1px solid var(--accent-muted);
-  align-self: flex-start;
-  margin-bottom: 0.5rem;
+  color: var(--vermilion);
+  margin-bottom: 0.75rem;
 }
-
-.auth-title {
-  font-size: 1.625rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--foreground);
-  margin: 0;
+.auth-form-title {
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
   line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 0.5rem;
 }
-
-.auth-subtitle {
+.auth-form-subtitle {
   font-size: 0.9rem;
-  color: var(--text-muted);
+  color: var(--ink-soft);
   margin: 0;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
+/* 폼 */
 .auth-form {
-  padding: 1.75rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0;
 }
 
-.auth-row {
+/* 2열 행 */
+.auth-row-2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.875rem;
+  gap: 0;
+  border-top: 1px solid var(--hairline);
+}
+.auth-row-2col .auth-field {
+  border-bottom: 1px solid var(--hairline);
+  border-top: none;
+}
+.auth-row-2col .auth-field:first-child {
+  border-right: 1px solid var(--hairline);
+  padding-right: 1rem;
+}
+.auth-row-2col .auth-field:last-child {
+  padding-left: 1rem;
 }
 
-/* Server error */
+/* 서버 에러 */
 .auth-server-error {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 0.875rem;
   padding: 0.875rem 1rem;
-  border-radius: var(--radius);
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
+  border: 1px solid var(--vermilion);
+  background: var(--vermilion-tint);
+  margin-bottom: 1.5rem;
 }
-.auth-server-error-icon {
+.auth-server-error-tag {
   flex-shrink: 0;
-  width: 1.375rem;
-  height: 1.375rem;
-  border-radius: 50%;
-  background: #ea580c;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.6875rem;
-  font-weight: 800;
   font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vermilion);
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--vermilion);
+  line-height: 1.4;
+  margin-top: 0.05rem;
 }
 .auth-server-error-text {
-  font-size: 0.9rem;
-  color: #9a3412;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--vermilion-deep);
   margin: 0;
   line-height: 1.6;
 }
 
-/* Fields */
+/* 필드 */
 .auth-field {
   display: flex;
   flex-direction: column;
-  gap: 0.4375rem;
+  gap: 0;
+  border-bottom: 1px solid var(--hairline);
+  padding: 1.25rem 0 1rem;
+}
+.auth-field:first-of-type {
+  border-top: 1px solid var(--hairline);
 }
 .auth-label {
-  font-size: 0.9rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.625rem;
+  cursor: pointer;
+}
+.auth-field-no {
+  color: var(--vermilion);
   font-weight: 600;
-  color: var(--foreground);
-  letter-spacing: -0.01em;
 }
-.auth-required {
-  color: var(--accent);
-}
+.auth-required { color: var(--vermilion); }
 .auth-input {
   width: 100%;
-  padding: 0.6875rem 1rem;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--background);
-  color: var(--foreground);
+  padding: 0.5625rem 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 0.9375rem;
+  line-height: 1.6;
   outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color 120ms ease;
   -webkit-appearance: none;
   appearance: none;
 }
-.auth-input::placeholder {
-  color: var(--text-subtle);
-}
+.auth-input::placeholder { color: var(--ink-faint); font-size: 0.875rem; }
 .auth-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-light);
+  border-color: var(--ink);
+  border-width: 2px;
 }
-.auth-input-error {
-  border-color: #f87171;
-}
+.auth-input-error { border-color: var(--vermilion); }
 .auth-input-error:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px #fee2e2;
+  border-color: var(--vermilion);
+  border-width: 2px;
 }
 .auth-error {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #dc2626;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-.auth-error::before {
-  content: '!';
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  background: #fee2e2;
-  color: #dc2626;
-  font-size: 0.65rem;
-  font-weight: 800;
   font-family: var(--font-mono);
-  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--vermilion);
+  margin: 0.5rem 0 0;
 }
 
-/* Submit */
+/* 제출 */
+.auth-submit-row {
+  padding-top: 2rem;
+}
 .auth-submit-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
   width: 100%;
-  padding: 0.75rem 1.5rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: background 150ms ease, box-shadow 150ms ease, transform 100ms ease;
-  box-shadow: 0 2px 8px rgb(79 70 229 / 0.25);
-  margin-top: 0.25rem;
-}
-.auth-submit-btn:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 4px 14px rgb(79 70 229 / 0.35);
-}
-.auth-submit-btn:active {
-  transform: translateY(1px);
 }
 .auth-submit-btn:disabled {
-  opacity: 0.65;
+  opacity: 0.55;
   cursor: not-allowed;
-  transform: none;
 }
 
-/* Card footer */
-.auth-card-footer {
-  padding: 1.25rem 2rem 1.75rem;
-  border-top: 1px solid var(--border-soft);
-  text-align: center;
+/* 푸터 */
+.auth-form-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--hairline-soft);
 }
 .auth-footer-text {
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
   margin: 0;
 }
 .auth-footer-link {
-  color: var(--accent);
+  color: var(--ink);
   font-weight: 600;
-  text-decoration: none;
-  transition: color 150ms ease;
-}
-.auth-footer-link:hover {
-  color: var(--accent-hover);
   text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 120ms ease;
 }
+.auth-footer-link:hover { color: var(--vermilion); }
 `;

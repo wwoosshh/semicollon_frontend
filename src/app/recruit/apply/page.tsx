@@ -18,60 +18,30 @@ async function fetchRecruitInfo(): Promise<RecruitInfo | null> {
   }
 }
 
-// ─── Icons ────────────────────────────────────────────────────
-function IconArrow() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M3 8h10M9 4l4 4-4 4" />
-    </svg>
-  );
-}
-
-function IconInfo() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
-    </svg>
-  );
+// ─── Helpers ──────────────────────────────────────────────────
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}.${m}.${day}`;
 }
 
 // ─── Closed State ─────────────────────────────────────────────
 function NotRecruitingView() {
   return (
-    <div className="apply-closed">
-      <div className="apply-closed-icon">
-        <IconInfo />
-      </div>
-      <p className="apply-closed-label">Not Recruiting</p>
-      <h1 className="apply-closed-title">지금은 모집 기간이 아닙니다</h1>
+    <div className="apply-closed-inner">
+      <p className="apply-closed-status">○ NOT RECRUITING</p>
+      <h1 className="apply-closed-h">
+        지금은 모집 기간이<br />아닙니다
+      </h1>
       <p className="apply-closed-desc">
         현재 신입 기수 모집이 진행되지 않습니다.
         모집이 시작되면 공지사항을 통해 안내드리겠습니다.
       </p>
-      <Link href="/recruit" className="btn btn-ghost apply-back-link">
-        모집 안내 보기 <IconArrow />
+      <hr className="apply-closed-rule" />
+      <Link href="/recruit" className="btn btn-ghost">
+        모집 안내 보기 →
       </Link>
     </div>
   );
@@ -85,160 +55,200 @@ export default async function ApplyPage() {
   return (
     <>
       <style>{`
-        /* ── Page Layout ── */
+        /* ── 페이지 레이아웃 ── */
         .apply-page {
-          padding: 4rem 1.25rem 6rem;
-        }
-        @media (min-width: 640px) {
-          .apply-page { padding: 5rem 2rem 7rem; }
-        }
-        @media (min-width: 1024px) {
-          .apply-page { padding: 5.5rem 2.5rem 8rem; }
-        }
-        .apply-inner {
-          max-width: 640px;
-          margin-inline: auto;
+          padding-top: 0;
+          padding-bottom: 6rem;
         }
 
-        /* ── Breadcrumb ── */
+        /* ── 페이지 헤더 바 ── */
+        .apply-header-bar {
+          border-bottom: 1px solid var(--ink);
+        }
+        .apply-header-inner {
+          display: grid;
+          grid-template-columns: 1fr;
+          min-height: 36vh;
+        }
+        @media (min-width: 900px) {
+          .apply-header-inner {
+            grid-template-columns: 1fr 200px;
+          }
+        }
+        .apply-header-main {
+          padding: 3.5rem 0 3rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+        }
+        @media (min-width: 900px) {
+          .apply-header-main {
+            border-right: 1px solid var(--hairline);
+            padding-right: 3rem;
+          }
+        }
+        .apply-eyebrow {
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          font-weight: 500;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--vermilion);
+          margin-bottom: 1.25rem;
+        }
+        .apply-h1 {
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: clamp(1.9rem, 5vw, 3rem);
+          line-height: 1.2;
+          letter-spacing: -0.02em;
+          color: var(--ink);
+          margin: 0 0 1rem;
+        }
+        .apply-lead {
+          font-size: 0.9375rem;
+          color: var(--ink-soft);
+          line-height: 1.8;
+          margin: 0;
+          max-width: 36rem;
+        }
+
+        /* 우측 메타 칼럼 */
+        .apply-header-meta {
+          display: flex;
+          flex-direction: column;
+          border-top: 1px solid var(--hairline-soft);
+          margin-top: 1rem;
+          padding-top: 1rem;
+        }
+        @media (min-width: 900px) {
+          .apply-header-meta {
+            border-top: none;
+            margin-top: 0;
+            padding-top: 3.5rem;
+            padding-left: 2rem;
+          }
+        }
+        .apply-meta-row {
+          padding: 0.75rem 0;
+          border-bottom: 1px solid var(--hairline-soft);
+        }
+        .apply-meta-row:last-child { border-bottom: none; }
+        .apply-meta-k {
+          display: block;
+          font-family: var(--font-mono);
+          font-size: 0.6rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--ink-faint);
+          margin-bottom: 0.2rem;
+        }
+        .apply-meta-v {
+          font-family: var(--font-mono);
+          font-size: 0.8rem;
+          color: var(--ink);
+        }
+
+        /* ── 브레드크럼 ── */
         .apply-breadcrumb {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          font-size: 0.875rem;
-          color: var(--text-subtle);
-          margin-bottom: 2.5rem;
-          flex-wrap: wrap;
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          letter-spacing: 0.06em;
+          color: var(--ink-faint);
+          padding: 1rem 0;
+          border-bottom: 1px solid var(--hairline-soft);
+          margin-bottom: 3rem;
         }
         .apply-breadcrumb a {
-          color: var(--text-muted);
+          color: var(--ink-soft);
           text-decoration: none;
           transition: color 120ms ease;
         }
-        .apply-breadcrumb a:hover {
-          color: var(--accent);
-        }
-        .apply-breadcrumb-sep {
-          color: var(--border);
-          user-select: none;
-        }
-        .apply-breadcrumb-current {
-          color: var(--foreground);
-          font-weight: 600;
+        .apply-breadcrumb a:hover { color: var(--vermilion); }
+        .apply-breadcrumb-sep { color: var(--hairline); }
+        .apply-breadcrumb-current { color: var(--ink); }
+
+        /* ── 폼 영역 ── */
+        .apply-form-area {
+          max-width: 720px;
         }
 
-        /* ── Page header ── */
-        .apply-header {
-          margin-bottom: 2.5rem;
+        /* ── 모집 아님 ── */
+        .apply-closed-inner {
+          padding: 5rem 0 6rem;
+          max-width: 40rem;
         }
-        .apply-eyebrow {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.375rem;
-          padding: 0.275rem 0.875rem;
-          border-radius: 999px;
-          background: var(--accent-light);
-          color: var(--accent);
+        .apply-closed-status {
           font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
-          letter-spacing: 0.08em;
+          font-size: 0.72rem;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
-          border: 1px solid var(--accent-muted);
-          margin-bottom: 1.25rem;
+          color: var(--ink-faint);
+          margin-bottom: 2rem;
         }
-        .apply-title {
-          font-size: clamp(1.75rem, 5vw, 2.5rem);
-          font-weight: 800;
-          letter-spacing: -0.035em;
-          line-height: 1.15;
-          color: var(--foreground);
-          margin: 0 0 0.75rem;
-        }
-        .apply-subtitle {
-          font-size: 1rem;
-          color: var(--text-muted);
-          line-height: 1.75;
-          margin: 0;
-          max-width: 480px;
-        }
-
-        /* ── Divider ── */
-        .apply-divider {
-          border: none;
-          border-top: 1px solid var(--border);
-          margin: 2.5rem 0;
-        }
-
-        /* ── Card wrapper for form ── */
-        .apply-card {
-          background: var(--background);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-xl);
-          padding: 2rem;
-          box-shadow: var(--shadow-sm);
-        }
-        @media (min-width: 640px) {
-          .apply-card {
-            padding: 2.5rem 3rem;
-          }
-        }
-
-        /* ── Closed state ── */
-        .apply-closed {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          gap: 1.25rem;
-          padding: 5rem 1.25rem;
-          max-width: 520px;
-          margin-inline: auto;
-        }
-        .apply-closed-icon {
-          width: 4rem;
-          height: 4rem;
-          border-radius: 50%;
-          background: var(--surface-alt);
-          color: var(--text-subtle);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .apply-closed-label {
-          font-family: var(--font-mono);
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: var(--text-subtle);
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          margin: 0;
-        }
-        .apply-closed-title {
-          font-size: clamp(1.5rem, 4vw, 2rem);
-          font-weight: 800;
-          letter-spacing: -0.03em;
-          color: var(--foreground);
-          margin: 0;
-          line-height: 1.2;
+        .apply-closed-h {
+          font-family: var(--font-serif);
+          font-weight: 900;
+          font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+          line-height: 1.25;
+          color: var(--ink);
+          margin: 0 0 1.25rem;
         }
         .apply-closed-desc {
-          font-size: 0.9375rem;
-          color: var(--text-muted);
-          margin: 0;
-          line-height: 1.8;
-          max-width: 400px;
+          font-size: 1rem;
+          line-height: 1.85;
+          color: var(--ink-soft);
+          margin: 0 0 2.5rem;
         }
-        .apply-back-link {
-          gap: 0.375rem;
-          margin-top: 0.5rem;
+        .apply-closed-rule {
+          border: 0;
+          border-top: 1px solid var(--hairline);
+          margin: 0 0 2.5rem;
         }
       `}</style>
 
+      {/* ── 페이지 헤더 ── */}
+      {isRecruiting && (
+        <section className="apply-header-bar">
+          <div className="container-page">
+            <div className="apply-header-inner">
+              <div className="apply-header-main rise">
+                <p className="apply-eyebrow">● APPLY — SEMICOLLON</p>
+                <h1 className="apply-h1">
+                  지원서 작성
+                </h1>
+                <p className="apply-lead">
+                  아래 양식을 작성해 주세요. 검토 후 등록하신 연락처로 결과를 안내해 드립니다.
+                </p>
+              </div>
+              <aside className="apply-header-meta">
+                <div className="apply-meta-row">
+                  <span className="apply-meta-k">Status</span>
+                  <span className="apply-meta-v" style={{ color: 'var(--vermilion)' }}>● OPEN</span>
+                </div>
+                {recruit?.end && (
+                  <div className="apply-meta-row">
+                    <span className="apply-meta-k">Deadline</span>
+                    <span className="apply-meta-v">{formatDate(recruit.end)}</span>
+                  </div>
+                )}
+                <div className="apply-meta-row">
+                  <span className="apply-meta-k">Process</span>
+                  <span className="apply-meta-v">서류 → 면접 → 합류</span>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+      )}
+
       {isRecruiting ? (
         <main className="apply-page">
-          <div className="apply-inner">
-            {/* Breadcrumb */}
+          <div className="container-page">
+            {/* 브레드크럼 */}
             <nav className="apply-breadcrumb" aria-label="breadcrumb">
               <Link href="/">홈</Link>
               <span className="apply-breadcrumb-sep" aria-hidden="true">/</span>
@@ -247,26 +257,17 @@ export default async function ApplyPage() {
               <span className="apply-breadcrumb-current">지원하기</span>
             </nav>
 
-            {/* Header */}
-            <header className="apply-header">
-              <span className="apply-eyebrow">Apply</span>
-              <h1 className="apply-title">지원서 작성</h1>
-              <p className="apply-subtitle">
-                아래 양식을 작성해 주세요. 검토 후 등록하신 연락처로 결과를 안내해 드립니다.
-              </p>
-            </header>
-
-            <hr className="apply-divider" />
-
-            {/* Form card */}
-            <div className="apply-card">
+            {/* 폼 */}
+            <div className="apply-form-area">
               <ApplyForm />
             </div>
           </div>
         </main>
       ) : (
-        <main className="apply-page">
-          <NotRecruitingView />
+        <main>
+          <div className="container-page">
+            <NotRecruitingView />
+          </div>
         </main>
       )}
     </>

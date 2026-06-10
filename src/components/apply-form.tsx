@@ -17,37 +17,19 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-// ─── Icons ────────────────────────────────────────────────────
-function IconCheck() {
-  return (
-    <svg
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
+// ─── Spinner ──────────────────────────────────────────────────
 function IconSpinner() {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth="2.5"
       strokeLinecap="round"
       aria-hidden="true"
-      style={{ animation: 'spin 0.75s linear infinite' }}
+      style={{ animation: 'af-spin 0.75s linear infinite' }}
     >
       <path d="M12 2a10 10 0 0 1 10 10" />
     </svg>
@@ -58,21 +40,57 @@ function IconSpinner() {
 function SuccessScreen() {
   return (
     <div className="af-success">
-      <div className="af-success-icon">
-        <IconCheck />
+      <style>{FORM_STYLES}</style>
+      {/* 인쇄물풍 접수증 헤더 */}
+      <div className="af-success-stamp">
+        <span className="af-success-stamp-no">APPLICATION RECEIVED</span>
       </div>
-      <div className="af-success-body">
-        <p className="af-success-eyebrow">Application Received</p>
-        <h2 className="af-success-title">지원이 완료되었습니다</h2>
-        <p className="af-success-desc">
-          지원해 주셔서 감사합니다! 검토 후 등록하신 연락처로 결과를 안내해 드리겠습니다.
-          <br />
-          <strong>다음 절차:</strong> 서류 검토 → 면접 안내 → 최종 합류 여부 통보
-        </p>
-        <Link href="/" className="btn btn-primary af-success-link">
-          홈으로 돌아가기
-        </Link>
+
+      <h2 className="af-success-headline">
+        접수되었습니다<span style={{ color: 'var(--vermilion)' }}>;</span>
+      </h2>
+
+      <div className="af-success-meta">
+        <div className="af-success-meta-row">
+          <span className="af-success-meta-k">STATUS</span>
+          <span className="af-success-meta-v" style={{ color: 'var(--vermilion)' }}>● RECEIVED</span>
+        </div>
+        <div className="af-success-meta-row">
+          <span className="af-success-meta-k">NEXT</span>
+          <span className="af-success-meta-v">서류 검토 → 면접 안내</span>
+        </div>
+        <div className="af-success-meta-row">
+          <span className="af-success-meta-k">CONTACT</span>
+          <span className="af-success-meta-v">등록하신 연락처로 결과 안내</span>
+        </div>
       </div>
+
+      <hr className="af-success-rule" />
+
+      <p className="af-success-note">
+        지원해 주셔서 감사합니다. 검토 후 결과를 연락드리겠습니다.
+      </p>
+
+      <div className="af-success-steps">
+        <div className="af-success-step">
+          <span className="af-success-step-no">01</span>
+          <span className="af-success-step-label">서류 검토</span>
+        </div>
+        <span className="af-success-step-arrow">→</span>
+        <div className="af-success-step">
+          <span className="af-success-step-no">02</span>
+          <span className="af-success-step-label">면접 안내</span>
+        </div>
+        <span className="af-success-step-arrow">→</span>
+        <div className="af-success-step">
+          <span className="af-success-step-no">03</span>
+          <span className="af-success-step-label">최종 합류</span>
+        </div>
+      </div>
+
+      <Link href="/" className="btn btn-primary" style={{ marginTop: '2rem' }}>
+        홈으로 돌아가기
+      </Link>
     </div>
   );
 }
@@ -116,30 +134,28 @@ export default function ApplyForm() {
   };
 
   if (submitted) {
-    return (
-      <>
-        <style>{FORM_STYLES}</style>
-        <SuccessScreen />
-      </>
-    );
+    return <SuccessScreen />;
   }
 
   return (
     <>
       <style>{FORM_STYLES}</style>
       <form className="af-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-        {/* Server error banner */}
+
+        {/* 서버 에러 배너 */}
         {serverError && (
           <div className="af-server-error" role="alert">
-            <span className="af-server-error-icon" aria-hidden="true">!</span>
+            <span className="af-server-error-tag">ERROR</span>
             <p className="af-server-error-text">{serverError}</p>
           </div>
         )}
 
-        {/* 이름 */}
+        {/* 01 이름 */}
         <div className="af-field">
           <label className="af-label" htmlFor="af-name">
-            이름 <span className="af-required" aria-hidden="true">*</span>
+            <span className="af-field-no">01</span>
+            이름
+            <span className="af-required" aria-hidden="true"> *</span>
           </label>
           <input
             id="af-name"
@@ -157,10 +173,12 @@ export default function ApplyForm() {
           )}
         </div>
 
-        {/* 연락처 */}
+        {/* 02 연락처 */}
         <div className="af-field">
           <label className="af-label" htmlFor="af-contact">
-            연락처 <span className="af-required" aria-hidden="true">*</span>
+            <span className="af-field-no">02</span>
+            연락처
+            <span className="af-required" aria-hidden="true"> *</span>
           </label>
           <input
             id="af-contact"
@@ -178,10 +196,12 @@ export default function ApplyForm() {
           )}
         </div>
 
-        {/* 지원 동기 */}
+        {/* 03 지원 동기 */}
         <div className="af-field">
           <label className="af-label" htmlFor="af-motivation">
-            지원 동기 <span className="af-required" aria-hidden="true">*</span>
+            <span className="af-field-no">03</span>
+            지원 동기
+            <span className="af-required" aria-hidden="true"> *</span>
           </label>
           <textarea
             id="af-motivation"
@@ -199,9 +219,10 @@ export default function ApplyForm() {
           )}
         </div>
 
-        {/* 경험/자기소개 (선택) */}
+        {/* 04 경험/자기소개 (선택) */}
         <div className="af-field">
           <label className="af-label" htmlFor="af-experience">
+            <span className="af-field-no">04</span>
             경험 / 자기소개
             <span className="af-optional"> (선택)</span>
           </label>
@@ -214,7 +235,7 @@ export default function ApplyForm() {
           />
         </div>
 
-        {/* Submit */}
+        {/* 제출 */}
         <div className="af-footer">
           <button
             type="submit"
@@ -242,152 +263,150 @@ export default function ApplyForm() {
 
 // ─── Styles ───────────────────────────────────────────────────
 const FORM_STYLES = `
-@keyframes spin {
+@keyframes af-spin {
   to { transform: rotate(360deg); }
 }
 @keyframes af-slide-in {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes af-pop-in {
-  0%   { opacity: 0; transform: scale(0.88); }
-  60%  { transform: scale(1.04); }
-  100% { opacity: 1; transform: scale(1); }
-}
 
-/* Form container */
+/* ── 폼 컨테이너 — 왼쪽 정렬 서류 양식 ── */
 .af-form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  animation: af-slide-in 0.35s ease both;
+  gap: 0;
+  animation: af-slide-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Server error */
+/* ── 서버 에러 ── */
 .af-server-error {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-radius: var(--radius);
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--vermilion);
+  background: var(--vermilion-tint);
+  margin-bottom: 0;
 }
-.af-server-error-icon {
+.af-server-error-tag {
   flex-shrink: 0;
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 50%;
-  background: #ea580c;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 800;
   font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vermilion);
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--vermilion);
+  line-height: 1.4;
+  margin-top: 0.1rem;
 }
 .af-server-error-text {
-  font-size: 0.9375rem;
-  color: #9a3412;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--vermilion-deep);
   margin: 0;
   line-height: 1.6;
 }
 
-/* Field */
+/* ── 필드 — 괘선으로 구획 ── */
 .af-field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0;
+  border-bottom: 1px solid var(--hairline);
+  padding: 1.5rem 0 1.25rem;
+}
+.af-field:first-of-type {
+  border-top: 1px solid var(--hairline);
+  margin-top: 1.75rem;
 }
 
-/* Label */
+/* ── 라벨 — 모노 대문자 소형 ── */
 .af-label {
-  font-size: 0.9375rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+.af-field-no {
+  color: var(--vermilion);
   font-weight: 600;
-  color: var(--foreground);
-  letter-spacing: -0.01em;
 }
 .af-required {
-  color: var(--accent);
+  color: var(--vermilion);
 }
 .af-optional {
   font-weight: 400;
-  font-size: 0.8125rem;
-  color: var(--text-subtle);
-  margin-left: 0.25rem;
+  font-size: 0.65rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
 }
 
-/* Input / Textarea */
+/* ── 인풋 / 텍스트에어리어 — 직각 + 잉크 보더 ── */
 .af-input,
 .af-textarea {
   width: 100%;
-  padding: 0.6875rem 1rem;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--background);
-  color: var(--foreground);
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--hairline);
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.9375rem;
+  line-height: 1.65;
   outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition: border-color 120ms ease;
   -webkit-appearance: none;
   appearance: none;
 }
 .af-input::placeholder,
 .af-textarea::placeholder {
-  color: var(--text-subtle);
+  color: var(--ink-faint);
+  font-size: 0.875rem;
 }
 .af-input:focus,
 .af-textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-light);
+  border-color: var(--ink);
+  border-width: 2px;
 }
 .af-textarea {
   resize: vertical;
   min-height: 100px;
 }
 .af-input-error {
-  border-color: #f87171;
+  border-color: var(--vermilion);
+  border-width: 1px;
 }
 .af-input-error:focus {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px #fee2e2;
+  border-color: var(--vermilion);
+  border-width: 2px;
 }
 
-/* Field error message */
+/* ── 에러 메시지 — 버밀리온 모노 ── */
 .af-error {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #dc2626;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-.af-error::before {
-  content: '!';
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  background: #fee2e2;
-  color: #dc2626;
-  font-size: 0.6875rem;
-  font-weight: 800;
   font-family: var(--font-mono);
-  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--vermilion);
+  margin: 0.5rem 0 0;
 }
 
-/* Submit row */
+/* ── 제출 푸터 ── */
 .af-footer {
   display: flex;
   flex-direction: column;
-  gap: 0.875rem;
-  padding-top: 0.5rem;
+  gap: 1rem;
+  padding-top: 2rem;
 }
 @media (min-width: 480px) {
   .af-footer {
@@ -398,76 +417,124 @@ const FORM_STYLES = `
 }
 .af-submit-btn {
   min-width: 10rem;
-  padding: 0.75rem 2rem;
 }
 .af-submit-btn:disabled {
-  opacity: 0.65;
+  opacity: 0.55;
   cursor: not-allowed;
-  transform: none;
 }
 .af-footer-note {
-  font-size: 0.8125rem;
-  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
   margin: 0;
-  line-height: 1.5;
 }
 
-/* Success */
+/* ── 성공 화면 — 인쇄물풍 접수증 ── */
 .af-success {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1.75rem;
-  padding: 3rem 1rem;
-  animation: af-pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  align-items: flex-start;
+  gap: 0;
+  padding: 0;
+  animation: af-slide-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.af-success-icon {
-  width: 4.5rem;
-  height: 4.5rem;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
+.af-success-stamp {
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 24px rgb(79 70 229 / 0.3);
+  gap: 0.75rem;
+  margin-bottom: 2rem;
 }
-.af-success-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.875rem;
-  max-width: 440px;
-}
-.af-success-eyebrow {
+.af-success-stamp-no {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  color: var(--accent);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin: 0;
+  color: var(--vermilion);
+  border: 1px solid var(--vermilion);
+  padding: 0.2rem 0.6rem;
 }
-.af-success-title {
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: var(--foreground);
-  margin: 0;
+.af-success-headline {
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: clamp(2rem, 6vw, 3.25rem);
   line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 2rem;
 }
-.af-success-desc {
+.af-success-meta {
+  width: 100%;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--hairline);
+}
+.af-success-meta-row {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+.af-success-meta-row:last-child {
+  border-bottom: none;
+}
+.af-success-meta-k {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.af-success-meta-v {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink);
+}
+.af-success-rule {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  margin: 1.75rem 0;
+}
+.af-success-note {
   font-size: 0.9375rem;
-  color: var(--text-muted);
+  color: var(--ink-soft);
   line-height: 1.8;
-  margin: 0;
+  margin: 0 0 1.5rem;
 }
-.af-success-desc strong {
-  color: var(--foreground);
+.af-success-steps {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  width: 100%;
+}
+.af-success-step {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.af-success-step-no {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
   font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--vermilion);
 }
-.af-success-link {
-  margin-top: 0.5rem;
+.af-success-step-label {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink);
+}
+.af-success-step-arrow {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-faint);
 }
 `;
