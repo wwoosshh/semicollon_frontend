@@ -62,7 +62,15 @@ export default function Header() {
           margin-left: 1px;
         }
         .hd-nav {
+          display: none;
           align-items: stretch;
+        }
+        @media (min-width: 768px) {
+          .hd-nav { display: flex; }
+        }
+        .hd-auth-desktop { display: none; }
+        @media (min-width: 768px) {
+          .hd-auth-desktop { display: flex; align-items: center; gap: 0.75rem; }
         }
         .hd-link {
           display: flex;
@@ -130,6 +138,7 @@ export default function Header() {
         }
         .hd-burger {
           display: flex;
+          /* 데스크톱에서는 숨김 — 아래 미디어 쿼리 */
           flex-direction: column;
           justify-content: center;
           align-items: center;
@@ -148,6 +157,13 @@ export default function Header() {
           height: 2px;
           background: var(--ink);
           transition: transform 200ms ease, opacity 200ms ease;
+        }
+        @media (min-width: 768px) {
+          .hd-burger { display: none; }
+        }
+        .hd-drawer-wrap { display: block; }
+        @media (min-width: 768px) {
+          .hd-drawer-wrap { display: none; }
         }
         .hd-drawer {
           overflow: hidden;
@@ -187,7 +203,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hd-nav hidden md:flex">
+          <nav className="hd-nav">
             {NAV_LINKS.map(({ href, no, label }) => (
               <Link
                 key={href}
@@ -204,20 +220,20 @@ export default function Header() {
           <div className="hd-auth">
             {!loading &&
               (session ? (
-                <div className="hidden md:flex" style={{ alignItems: 'center', gap: '0.75rem' }}>
+                <div className="hd-auth-desktop">
                   <span className="hd-user">{displayName}</span>
                   <button onClick={handleSignOut} className="hd-authlink" type="button">
                     로그아웃
                   </button>
                 </div>
               ) : (
-                <Link href="/login" className="hd-authlink hidden md:inline-flex">
+                <Link href="/login" className="hd-authlink hd-auth-desktop">
                   로그인
                 </Link>
               ))}
 
             <button
-              className="hd-burger md:hidden"
+              className="hd-burger"
               onClick={() => setMenuOpen((prev) => !prev)}
               aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
               aria-expanded={menuOpen}
@@ -231,7 +247,7 @@ export default function Header() {
       </div>
 
       {/* Mobile drawer */}
-      <div className="hd-drawer md:hidden" style={{ maxHeight: menuOpen ? '480px' : '0' }}>
+      <div className="hd-drawer hd-drawer-wrap" style={{ maxHeight: menuOpen ? '480px' : '0' }}>
         <nav className="container-page" style={{ padding: '0.5rem 1.25rem 1.25rem' }}>
           {NAV_LINKS.map(({ href, no, label }) => (
             <Link
