@@ -7,9 +7,11 @@ import { api, ApiError } from '@/lib/api';
 import type { Application, RecruitInfo } from '@/lib/types';
 import AboutManager from './AboutManager';
 import ActivitiesManager from './ActivitiesManager';
+import MembersManager from './MembersManager';
+import EventsManager from './EventsManager';
 
 // ─── Types ────────────────────────────────────────────────────
-type Tab = 'applications' | 'recruit' | 'invite' | 'about' | 'activities';
+type Tab = 'applications' | 'recruit' | 'invite' | 'about' | 'activities' | 'members' | 'events';
 type StatusFilter = 'all' | 'pending' | 'accepted' | 'rejected';
 
 // ─── Icons ────────────────────────────────────────────────────
@@ -75,6 +77,30 @@ function IconActivity() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </svg>
+  );
+}
+
+function IconPeople() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+function IconCalendarEvent() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="8" y1="14" x2="16" y2="14" />
+      <line x1="8" y1="18" x2="12" y2="18" />
     </svg>
   );
 }
@@ -738,6 +764,8 @@ export default function AdminDashboard() {
     { id: 'invite', label: '초대 코드', icon: <IconKey /> },
     { id: 'about', label: '소개 관리', icon: <IconInfo /> },
     { id: 'activities', label: '활동 관리', icon: <IconActivity /> },
+    { id: 'members', label: '부원 관리', icon: <IconPeople /> },
+    { id: 'events', label: '일정 관리', icon: <IconCalendarEvent /> },
   ];
 
   return (
@@ -779,6 +807,8 @@ export default function AdminDashboard() {
               {activeTab === 'invite' && <InviteTab token={token} />}
               {activeTab === 'about' && <AboutManager token={token} />}
               {activeTab === 'activities' && <ActivitiesManager token={token} />}
+              {activeTab === 'members' && <MembersManager token={token} />}
+              {activeTab === 'events' && <EventsManager token={token} />}
             </div>
           </div>
         </div>
