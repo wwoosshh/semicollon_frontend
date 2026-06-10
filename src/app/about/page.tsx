@@ -1,45 +1,11 @@
 import type { Metadata } from 'next';
+import { api } from '@/lib/api';
+import type { AboutContent } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: '소개 | 세미콜론',
   description: '세미콜론 개발 동아리 소개 — 비전, 연혁, 운영진, FAQ',
 };
-
-// ─── Data Constants ───────────────────────────────────────────
-const HISTORY = [
-  { year: '2024', items: ['동아리 창립', '창립 세미나 개최', '첫 스터디 그룹 운영'] },
-  { year: '2025', items: ['첫 해커톤 개최', '웹·앱 팀 프로젝트 결과 발표', '2기 기수 모집'] },
-  { year: '2026', items: ['3기 신입 기수 모집', '외부 연사 초청 세미나', '연간 프로젝트 데모데이'] },
-];
-
-const STAFF = [
-  { name: '김민준', role: '회장', desc: '풀스택 개발 / 동아리 전반 운영' },
-  { name: '이서연', role: '부회장', desc: '프론트엔드 개발 / 행사 기획' },
-  { name: '박재현', role: '총무', desc: '백엔드 개발 / 재정·행정 관리' },
-];
-
-const FAQ = [
-  {
-    q: '비전공자도 지원할 수 있나요?',
-    a: '네, 환영합니다. 전공 여부보다 개발에 대한 관심과 함께 성장하려는 의지를 중시합니다. 기초 프로그래밍 경험이 있으면 충분합니다.',
-  },
-  {
-    q: '주 활동 시간은 어떻게 되나요?',
-    a: '주 1회 정기 모임(약 2시간)을 원칙으로 하며, 스터디·프로젝트 팀별로 추가 일정을 자율 조율합니다.',
-  },
-  {
-    q: '회비가 있나요?',
-    a: '소정의 학기 회비가 있으며 행사 운영·간식·자료 인쇄 등에 사용됩니다. 정확한 금액은 기수별 모집 공고를 확인해 주세요.',
-  },
-  {
-    q: '입부 전에 미리 준비해야 할 게 있나요?',
-    a: '별도의 사전 준비는 필요 없습니다. 노트북과 배우고자 하는 의지만 가져오세요. 입부 후 온보딩 세션을 통해 안내드립니다.',
-  },
-  {
-    q: '졸업 후에도 활동할 수 있나요?',
-    a: '졸업한 선배들은 OB로 연결을 유지하며 멘토링·세미나 연사 등 형태로 동아리와 함께합니다.',
-  },
-];
 
 const VISION = [
   { no: '01', en: 'LEARN TOGETHER', ko: '함께 배우기', body: '혼자보다 같이할 때 더 빠릅니다. 주제별 스터디로 꾸준히 학습합니다.' },
@@ -49,7 +15,29 @@ const VISION = [
 ];
 
 // ─── Page ─────────────────────────────────────────────────────
-export default function AboutPage() {
+export default async function AboutPage() {
+  let about: AboutContent;
+  try {
+    about = await api<AboutContent>('/settings/about', { cache: 'no-store' });
+  } catch {
+    about = { history: [], staff: [], faq: [] };
+  }
+
+  // Group flat history items by year for table display
+  const historyByYear: Map<string, string[]> = new Map();
+  for (const item of about.history) {
+    const existing = historyByYear.get(item.year);
+    if (existing) {
+      existing.push(item.title);
+    } else {
+      historyByYear.set(item.year, [item.title]);
+    }
+  }
+  const historyEntries = Array.from(historyByYear.entries()).map(([year, items]) => ({ year, items }));
+
+  // Founded year: first history item year or fallback
+  const foundedYear = about.history.length > 0 ? about.history[0].year : '2026.06';
+
   return (
     <>
       <style>{`
@@ -322,6 +310,14 @@ export default function AboutPage() {
         }
         .staff-row:hover .staff-role-tag { color: var(--vermilion); }
 
+        /* ── 빈 상태 ── */
+        .ab-empty {
+          font-family: var(--font-mono);
+          font-size: 0.82rem;
+          color: var(--ink-faint);
+          padding: 2rem 0;
+        }
+
         /* ── 04 FAQ: 괘선 행 ── */
         .faq-item {
           border-bottom: 1px solid var(--hairline);
@@ -403,7 +399,7 @@ export default function AboutPage() {
             <aside className="ab-meta rise rise-4">
               <div className="ab-meta-row">
                 <span className="ab-meta-k">Founded</span>
-                <span className="ab-meta-v">2024</span>
+                <span className="ab-meta-v">{foundedYear}</span>
               </div>
               <div className="ab-meta-row">
                 <span className="ab-meta-k">Field</span>
@@ -460,25 +456,29 @@ export default function AboutPage() {
             </span>
           </div>
           <div className="ab-sec-body" style={{ paddingBottom: '2.5rem' }}>
-            <table className="history-table">
-              <tbody>
-                {HISTORY.map((entry) => (
-                  <tr key={entry.year} className="history-year-row">
-                    <td className="history-year">{entry.year}</td>
-                    <td className="history-items">
-                      {entry.items.map((item, idx) => (
-                        <div key={item} className="history-item-row">
-                          <span className="history-bullet" aria-hidden="true">
-                            {String(idx + 1).padStart(2, '0')}
-                          </span>
-                          <span className="history-text">{item}</span>
-                        </div>
-                      ))}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {historyEntries.length === 0 ? (
+              <p className="ab-empty">{'// 준비 중입니다'}</p>
+            ) : (
+              <table className="history-table">
+                <tbody>
+                  {historyEntries.map((entry) => (
+                    <tr key={entry.year} className="history-year-row">
+                      <td className="history-year">{entry.year}</td>
+                      <td className="history-items">
+                        {entry.items.map((item, idx) => (
+                          <div key={item} className="history-item-row">
+                            <span className="history-bullet" aria-hidden="true">
+                              {String(idx + 1).padStart(2, '0')}
+                            </span>
+                            <span className="history-text">{item}</span>
+                          </div>
+                        ))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </section>
@@ -495,18 +495,22 @@ export default function AboutPage() {
             </span>
           </div>
           <div className="ab-sec-body" style={{ paddingBottom: '1rem' }}>
-            <div className="staff-table">
-              {STAFF.map((member, idx) => (
-                <div key={member.name} className="staff-row">
-                  <span className="staff-idx">{String(idx + 1).padStart(2, '0')}</span>
-                  <div className="staff-name-cell">
-                    <span className="staff-name">{member.name}</span>
-                    <span className="staff-desc">{member.desc}</span>
+            {about.staff.length === 0 ? (
+              <p className="ab-empty">{'// 준비 중입니다'}</p>
+            ) : (
+              <div className="staff-table">
+                {about.staff.map((member, idx) => (
+                  <div key={member.name} className="staff-row">
+                    <span className="staff-idx">{String(idx + 1).padStart(2, '0')}</span>
+                    <div className="staff-name-cell">
+                      <span className="staff-name">{member.name}</span>
+                      {member.note && <span className="staff-desc">{member.note}</span>}
+                    </div>
+                    <span className="staff-role-tag">{member.role}</span>
                   </div>
-                  <span className="staff-role-tag">{member.role}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -523,20 +527,24 @@ export default function AboutPage() {
             </span>
           </div>
           <div className="ab-sec-body" style={{ paddingTop: '0.5rem' }}>
-            {FAQ.map((item, idx) => (
-              <div key={item.q} className="faq-item">
-                <details>
-                  <summary className="faq-summary">
-                    <div className="faq-summary-inner">
-                      <span className="faq-q-no">Q{String(idx + 1).padStart(2, '0')}</span>
-                      <p className="faq-q">{item.q}</p>
-                    </div>
-                    <span className="faq-toggle" aria-hidden="true">+</span>
-                  </summary>
-                  <p className="faq-answer">{item.a}</p>
-                </details>
-              </div>
-            ))}
+            {about.faq.length === 0 ? (
+              <p className="ab-empty">{'// 준비 중입니다'}</p>
+            ) : (
+              about.faq.map((item, idx) => (
+                <div key={item.q} className="faq-item">
+                  <details>
+                    <summary className="faq-summary">
+                      <div className="faq-summary-inner">
+                        <span className="faq-q-no">Q{String(idx + 1).padStart(2, '0')}</span>
+                        <p className="faq-q">{item.q}</p>
+                      </div>
+                      <span className="faq-toggle" aria-hidden="true">+</span>
+                    </summary>
+                    <p className="faq-answer">{item.a}</p>
+                  </details>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>

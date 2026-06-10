@@ -45,3 +45,12 @@ export interface Application {
   status: 'pending' | 'accepted' | 'rejected';
   created_at: string;
 }
+
+export interface AboutHistoryItem { year: string; title: string; }
+export interface AboutStaffItem { name: string; role: string; note?: string; }
+export interface AboutFaqItem { q: string; a: string; }
+export interface AboutContent {
+  history: AboutHistoryItem[];
+  staff: AboutStaffItem[];
+  faq: AboutFaqItem[];
+}
