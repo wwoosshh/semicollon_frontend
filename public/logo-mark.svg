@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 세미콜론 단독 마크 (투명 배경) — 외부 사용·인쇄용 -->
+  <rect x="24" y="8" width="16" height="16" fill="#d23b18"/>
+  <path d="M24 30 H40 V46 L29 60 H21 L29.5 46 H24 Z" fill="#1c1a15"/>
+</svg>
