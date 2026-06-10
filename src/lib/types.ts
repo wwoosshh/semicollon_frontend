@@ -54,3 +54,13 @@ export interface AboutContent {
   staff: AboutStaffItem[];
   faq: AboutFaqItem[];
 }
+
+export interface ClubEvent {
+  id: number;
+  title: string;
+  description: string | null;
+  location: string | null;
+  starts_at: string;
+  ends_at: string | null;
+  created_at: string;
+}

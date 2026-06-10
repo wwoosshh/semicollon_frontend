@@ -5,6 +5,7 @@ const NAV = [
   { href: '/activities', no: '02', label: '활동' },
   { href: '/posts',      no: '03', label: '소식' },
   { href: '/recruit',    no: '04', label: '모집' },
+  { href: '/calendar',   no: '05', label: '일정' },
 ] as const;
 
 export default function Footer() {
