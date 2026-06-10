@@ -28,13 +28,11 @@ export default function Comments({ postId }: { postId: string }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // NOTE: Delete button is shown only to admin.
-  // Per-comment author id is not returned by the API, so we cannot compare
-  // the current user's id against comment.author. A future improvement would
-  // be to add author_id to the comment response and show the delete button to
-  // the comment's own author as well.
+  // 삭제 버튼: 관리자 또는 댓글 작성자 본인
   const isAdmin = profile?.role === 'admin';
   const isMember = !!session && !!profile;
+  const canDelete = (c: PostComment) =>
+    isAdmin || (!!profile && c.author?.id === profile.id);
 
   const loadComments = useCallback(async () => {
     setLoadingComments(true);
@@ -388,7 +386,7 @@ export default function Comments({ postId }: { postId: string }) {
                   </div>
                   <p className="cmt-body">{c.content}</p>
                 </div>
-                {isAdmin && (
+                {canDelete(c) && (
                   <button
                     className="cmt-del-btn"
                     onClick={() => handleDelete(c.id)}

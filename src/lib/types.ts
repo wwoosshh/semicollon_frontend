@@ -42,7 +42,7 @@ export interface PostComment {
   id: number;
   content: string;
   created_at: string;
-  author: { name: string } | null;
+  author: { id: string; name: string } | null;
 }
 
 export interface Application {
