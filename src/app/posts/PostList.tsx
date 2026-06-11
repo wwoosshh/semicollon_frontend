@@ -86,8 +86,31 @@ export default function PostList() {
   }, []);
 
   useEffect(() => {
-    fetchPosts(category);
-  }, [category, fetchPosts]);
+    let ignore = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = await getAccessToken();
+        const path = category ? `/posts?category=${category}` : '/posts';
+        const data = await api<PostSummary[]>(path, { token });
+        if (!ignore) setPosts(data);
+      } catch (e) {
+        if (!ignore) {
+          if (e instanceof ApiError) {
+            setError(`서버 오류가 발생했습니다. (${e.status})`);
+          } else {
+            setError('서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.');
+          }
+          setPosts([]);
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+    load();
+    return () => { ignore = true; };
+  }, [category]);
 
   return (
     <>

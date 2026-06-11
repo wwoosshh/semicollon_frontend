@@ -106,13 +106,30 @@ export default function PostEditor() {
   });
 
   // ── Image upload ─────────────────────────────────────────
+  const MAX_UPLOAD = 5 * 1024 * 1024;
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    if (!files.length) return;
+    const raw = Array.from(e.target.files ?? []);
+    if (!raw.length) return;
     e.target.value = '';
 
+    const files: File[] = [];
+    for (const file of raw) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setServerError('이미지 파일(jpg/png/webp/gif)만 업로드할 수 있습니다.');
+        continue;
+      }
+      if (file.size > MAX_UPLOAD) {
+        setServerError('파일 크기는 5MB 이하여야 합니다.');
+        continue;
+      }
+      files.push(file);
+    }
+    if (!files.length) return;
+
     const newImages: UploadedImage[] = files.map((file) => ({
-      id: `${Date.now()}-${Math.random()}`,
+      id: crypto.randomUUID(),
       url: '',
       previewUrl: URL.createObjectURL(file),
       name: file.name,

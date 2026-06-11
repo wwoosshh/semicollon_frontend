@@ -139,6 +139,7 @@ export default async function Home() {
           border-top: 1px solid var(--ink);
           display: flex;
           flex-direction: column;
+          background: var(--paper);
         }
         @media (min-width: 900px) {
           .hero-meta {

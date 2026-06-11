@@ -93,6 +93,8 @@ function EventModal({
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  if (events.length === 0) return null;
+
   return (
     <div className="cal-modal-backdrop overlay-backdrop-anim" onClick={onClose} role="dialog" aria-modal="true">
       <div
@@ -186,8 +188,29 @@ export default function CalendarView() {
   }, []);
 
   useEffect(() => {
-    fetchEvents(year, month);
-  }, [year, month, fetchEvents]);
+    let ignore = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      const from = toYYYYMMDD(new Date(year, month, 1));
+      const to = toYYYYMMDD(new Date(year, month + 1, 0));
+      try {
+        const data = await api<ClubEvent[]>(`/events?from=${from}&to=${to}`, {
+          cache: 'no-store',
+        } as RequestInit);
+        if (!ignore) setEvents(data);
+      } catch {
+        if (!ignore) {
+          setError('일정을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+          setEvents([]);
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+    load();
+    return () => { ignore = true; };
+  }, [year, month]);
 
   const prevMonth = () => {
     if (month === 0) { setYear(y => y - 1); setMonth(11); }

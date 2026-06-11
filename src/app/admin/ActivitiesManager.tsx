@@ -138,10 +138,22 @@ function ActivityForm({
   };
 
   // ── Thumbnail upload ────────────────────────────────────────
+  const MAX_UPLOAD = 5 * 1024 * 1024;
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
   const handleThumbFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     e.target.value = '';
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      showFeedback(false, '이미지 파일(jpg/png/webp/gif)만 업로드할 수 있습니다.');
+      return;
+    }
+    if (file.size > MAX_UPLOAD) {
+      showFeedback(false, '파일 크기는 5MB 이하여야 합니다.');
+      return;
+    }
 
     const preview = URL.createObjectURL(file);
     setThumbPreview(preview);
