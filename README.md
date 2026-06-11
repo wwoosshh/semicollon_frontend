@@ -27,13 +27,28 @@ npm install
 
 | 경로 | 설명 |
 |---|---|
-| `/` | 메인 (스토리형: 히어로 → 활동 소개 → 최근 소식 → 모집 배너) |
-| `/about` | 동아리 소개 (비전·연혁·운영진·FAQ — 페이지 상단 상수 배열 수정으로 내용 변경) |
-| `/activities`, `/activities/[id]` | 활동 아카이브 (유형 필터) |
-| `/posts`, `/posts/[id]`, `/posts/new` | 게시판 (부원 로그인 시 부원 공개 글 노출, 글쓰기) |
+| `/` | 메인 (활자 조판 히어로 → 활동 소개 → 최근 소식 → 티커 → 모집 배너) |
+| `/about` | 동아리 소개 — 연혁·운영진·FAQ는 관리자 페이지에서 수정 (API 연동) |
+| `/activities`, `/activities/[id]` | 활동 아카이브 (유형 필터, 이미지 갤러리) |
+| `/posts`, `/posts/[id]`, `/posts/new` | 게시판 (부원 공개 글, 댓글, 글쓰기·이미지 첨부) |
+| `/calendar` | 일정 — 월 달력 + 일정 오버레이 |
 | `/recruit`, `/recruit/apply` | 모집 안내·지원서 (모집 기간에만 제출 가능) |
 | `/login`, `/signup` | 로그인 / 초대 코드 가입 |
-| `/admin` | 관리자 (지원자 관리·모집 기간·초대 코드) |
+| `/admin` | 관리자 — 탭 7개: 지원자 / 모집 설정 / 초대 코드 / 소개 / 활동 / 부원 / 일정 |
+
+## 디자인·모션 시스템
+
+"기술 동아리의 인쇄물" — 종이(#f6f4ee)·잉크(#1c1a15)·버밀리온(#d23b18) 단일 스팟, Noto Serif KR(헤드라인) + Pretendard(본문) + IBM Plex Mono(라벨). 토큰은 `src/app/globals.css`. 모션: 활자 조판 히어로, CSS 스크롤 구동 리빌(.vt-rise), 잉크 스와이프 버튼, 타자기 로딩(.loading-line) — 전부 CSS 전용, `prefers-reduced-motion` 대응. 브랜드 에셋(파비콘/OG)은 `scripts/generate-brand.mjs`로 재생성.
+
+## 시각 회귀 검증
+
+```
+npm run build
+npx next start -p 3100   # 별도 터미널
+node scripts/screenshot.mjs
+```
+
+`screenshots/`에 전 페이지 × 모바일/데스크톱 스크린샷이 생성된다 (reducedMotion 모드 — 레이아웃 검증용).
 
 ## Vercel 배포
 
