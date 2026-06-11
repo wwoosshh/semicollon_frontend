@@ -32,5 +32,8 @@ export async function api<T>(path: string, options: ApiOptions = {}): Promise<T>
       : (data?.message ?? '요청에 실패했습니다.');
     throw new ApiError(res.status, message);
   }
-  return res.json() as Promise<T>;
+  // 204 또는 빈 바디 응답(DELETE 등)에서 res.json()이 throw하지 않도록 방어
+  if (res.status === 204) return undefined as T;
+  const text = await res.text();
+  return (text ? JSON.parse(text) : undefined) as T;
 }
